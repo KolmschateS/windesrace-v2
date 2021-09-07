@@ -10,6 +10,15 @@ namespace Model
 
         public Track(string name, SectionTypes[] sections)
         {
+            this.Name = name;
+
+
+            // Adds the sections given in the constructor to the Sections
+            // linkedlist property
+            foreach (var section in sections)
+            {
+                Sections.AddLast(new Section(section));
+            }
         }
     }
 }
