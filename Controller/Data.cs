@@ -5,8 +5,9 @@ namespace Controller
     public static class Data
     {
         public static Competition competition;
+        public static Race currentRace { get; set; }
 
-        // Sort of constructor. Initializes the data used in the application
+        // Soft of a constructor. Initializes the data used in the application
         public static void Initialize()
         {
             competition = new Competition();
@@ -19,7 +20,7 @@ namespace Controller
             // Adds as much participants given with the method
             for (int i = 0; i < max; i++)
             {
-                competition.Participants.Add(new Pilot(
+                competition.Participants.Add(new Astronaut(
                     "Pilot" + i, // Name
                     0, // Points
                     new Spacecraft( // Equipement -> Spacecraft
@@ -30,7 +31,8 @@ namespace Controller
                     TeamColors.Red)); // Team color
             }
         }
-
+        // This method adds track to the competition
+        // TODO get tracks from seperate file
         public static void AddTracksToCompetition()
         {
             Track track1 = new Track("Track1", new SectionTypes[]
@@ -57,7 +59,15 @@ namespace Controller
                 SectionTypes.Straight,
                 SectionTypes.Straight,
             });
+        }
 
+
+        public static void NextRace()
+        {
+            if(competition.NextTrack() != null)
+            {
+                currentRace.Track = competition.NextTrack();
+            }
         }
     }
 }
