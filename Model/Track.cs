@@ -12,7 +12,6 @@ namespace Model
         {
             this.Name = name;
 
-
             // Adds the sections given in the constructor to the Sections
             // linkedlist property
             foreach (var section in sections)
