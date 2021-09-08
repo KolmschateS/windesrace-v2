@@ -17,6 +17,7 @@ namespace Controller
         {
             Track = track;
             Pilots = pilots;
+            StartTime = DateTime.Now;
             _random = new Random(DateTime.Now.Millisecond);
 
             //TODO RandomizeEquipement?

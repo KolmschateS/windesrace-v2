@@ -11,6 +11,7 @@ namespace Model
         public Track(string name, SectionTypes[] sections)
         {
             this.Name = name;
+            Sections = new LinkedList<Section>();
 
             // Adds the sections given in the constructor to the Sections
             // linkedlist property
