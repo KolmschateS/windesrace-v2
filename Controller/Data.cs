@@ -81,14 +81,10 @@ namespace Controller
             competition.Tracks.Enqueue(track1);
             competition.Tracks.Enqueue(track2);
         }
-
-
+        // Method to initiate next race.
         public static void NextRace()
         {
-            if(competition.NextTrack() != null)
-            {
-                CurrentRace = new Race(competition.Tracks.Dequeue(), competition.Participants);
-            }
+            CurrentRace = new Race(competition.NextTrack(), competition.Participants);
         }
     }
 }
