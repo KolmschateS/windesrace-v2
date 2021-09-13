@@ -11,14 +11,23 @@ namespace Model
         public Track(string name, SectionTypes[] sections)
         {
             this.Name = name;
-            Sections = new LinkedList<Section>();
+            Sections = SetSections(sections);
 
             // Adds the sections given in the constructor to the Sections
             // linkedlist property
-            foreach (var section in sections)
+
+        }
+        // Funtion to set the Sections property by looping over an Array containing the sections and inserting them
+        // into the Linkedlist with sections
+        public LinkedList<Section> SetSections(SectionTypes[] sections)
+        {
+            LinkedList<Section> sectionsList = new LinkedList<Section>();
+            foreach (SectionTypes section in sections)
             {
-                Sections.AddLast(new Section(section));
+                sectionsList.AddLast(new Section(section));
             }
+
+            return sectionsList;
         }
     }
 }

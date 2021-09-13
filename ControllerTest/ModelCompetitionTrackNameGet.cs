@@ -14,7 +14,7 @@ namespace ControllerTest
         }
 
         [Test]
-        public void Test()
+        public void IsNameSet()
         {
             Assert.AreEqual(Track.Name, "Test");
         }

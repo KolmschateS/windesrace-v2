@@ -9,7 +9,7 @@ namespace Controller
         public static Competition competition { get; set; }
         public static Race CurrentRace { get; set; }
 
-        // Soft of a constructor. Initializes the data used in the application
+        // Sort of a constructor. Initializes the data used in the application
         public static void Initialize()
         {
             competition = new Competition();
