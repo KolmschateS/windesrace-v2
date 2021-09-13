@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Model;
 
 namespace Controller
@@ -27,61 +28,16 @@ namespace Controller
             }
         }
         // This method adds track to the competition
-        // TODO get tracks from seperate file
         public static void AddTracksToCompetition()
         {
-            Track track1 = new Track("Track1", new SectionTypes[]
+            TrackData tracks = new TrackData();
+            foreach(KeyValuePair<String, Track> track in tracks.Tracks)
             {
-                SectionTypes.Finish,
-                SectionTypes.Straight,
-                SectionTypes.Straight,
-                SectionTypes.LeftCorner,
-                SectionTypes.Straight,
-                SectionTypes.RightCorner,
-                SectionTypes.Straight,
-                SectionTypes.RightCorner,
-                SectionTypes.Straight,
-                SectionTypes.Straight,
-                SectionTypes.RightCorner,
-                SectionTypes.Straight,
-                SectionTypes.Straight,
-                SectionTypes.Straight,
-                SectionTypes.Straight,
-                SectionTypes.Straight,
-                SectionTypes.RightCorner,
-                SectionTypes.Straight,
-                SectionTypes.RightCorner,
-                SectionTypes.Straight,
-                SectionTypes.Straight,
-            });
-            Track track2 = new Track("Track2", new SectionTypes[]
-            {
-                SectionTypes.Finish,
-                SectionTypes.Straight,
-                SectionTypes.Straight,
-                SectionTypes.LeftCorner,
-                SectionTypes.Straight,
-                SectionTypes.RightCorner,
-                SectionTypes.Straight,
-                SectionTypes.RightCorner,
-                SectionTypes.Straight,
-                SectionTypes.Straight,
-                SectionTypes.RightCorner,
-                SectionTypes.Straight,
-                SectionTypes.Straight,
-                SectionTypes.Straight,
-                SectionTypes.Straight,
-                SectionTypes.Straight,
-                SectionTypes.RightCorner,
-                SectionTypes.Straight,
-                SectionTypes.RightCorner,
-                SectionTypes.Straight,
-                SectionTypes.Straight,
-            });
-            competition.Tracks.Enqueue(track1);
-            competition.Tracks.Enqueue(track2);
+                competition.Tracks.Enqueue(track.Value);
+            }
         }
         // Method to initiate next race.
+        // TODO stop from crashing when the Competition.track Queue is empty
         public static void NextRace()
         {
             CurrentRace = new Race(competition.NextTrack(), competition.Participants);
