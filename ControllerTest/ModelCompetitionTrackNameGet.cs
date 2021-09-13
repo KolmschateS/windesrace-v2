@@ -4,7 +4,7 @@ using NUnit.Framework;
 namespace ControllerTest
 {
     [TestFixture]
-    public class Model_Competition_TrackNameGet
+    public class ModelCompetitionTrackNameGet
     {
         private Track Track;
         [SetUp]

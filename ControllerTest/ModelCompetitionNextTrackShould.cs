@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace ControllerTest
 {
     [TestFixture]
-    public class Model_Competition_NextTrackShould
+    public class ModelCompetitionNextTrackShould
     {
         public Competition Competition;
         [SetUp]
@@ -15,7 +15,7 @@ namespace ControllerTest
         }
 
         [Test]
-        public void NextTrack_EmptyQueue_ReturnNull()
+        public void NextTrackEmptyQueueReturnNull()
         {
             // Should get the next track from the Competetition, no tracks are added so it should return null
             var result = Competition.NextTrack();
@@ -23,7 +23,7 @@ namespace ControllerTest
         }
         
         [Test]
-        public void NextTrack_OneInQueue_ReturnTrack()
+        public void NextTrackOneInQueueReturnTrack()
         {
             // Adds a track to the competition
             Track testTrack = new Track("testTrack", new SectionTypes[]{SectionTypes.Finish});
@@ -35,7 +35,7 @@ namespace ControllerTest
         }
         
         [Test]
-        public void NextTrack_OneInQueue_RemoveTrackFromQueue()
+        public void NextTrackOneInQueueRemoveTrackFromQueue()
         {
             Track testTrack = new Track("testTrack", new SectionTypes[]{SectionTypes.Finish});
             Competition.Tracks.Enqueue(testTrack);
@@ -46,7 +46,7 @@ namespace ControllerTest
         }
         
         [Test]
-        public void NextTrack_TwoInQueue_ReturnNextTrack()
+        public void NextTrackTwoInQueueReturnNextTrack()
         {
             Track testTrack = new Track("testTrack", new SectionTypes[]{SectionTypes.Finish});
             Competition.Tracks.Enqueue(testTrack);
