@@ -26,7 +26,7 @@ namespace ControllerTest
         public void NextTrackOneInQueueReturnTrack()
         {
             // Adds a track to the competition
-            Track testTrack = new Track("testTrack", new SectionTypes[]{SectionTypes.Finish});
+            Track testTrack = new Track("testTrack", new SectionTypes[]{SectionTypes.Finish}, 1);
             Competition.Tracks.Enqueue(testTrack);
             
             // Gets the next track from the competition, should be the same track as added before.
@@ -37,7 +37,7 @@ namespace ControllerTest
         [Test]
         public void NextTrackOneInQueueRemoveTrackFromQueue()
         {
-            Track testTrack = new Track("testTrack", new SectionTypes[]{SectionTypes.Finish});
+            Track testTrack = new Track("testTrack", new SectionTypes[]{SectionTypes.Finish}, 1);
             Competition.Tracks.Enqueue(testTrack);
             
             Track result = Competition.NextTrack();
@@ -48,10 +48,10 @@ namespace ControllerTest
         [Test]
         public void NextTrackTwoInQueueReturnNextTrack()
         {
-            Track testTrack = new Track("testTrack", new SectionTypes[]{SectionTypes.Finish});
+            Track testTrack = new Track("testTrack", new SectionTypes[]{SectionTypes.Finish}, 1);
             Competition.Tracks.Enqueue(testTrack);
             
-            Track testTrack1 = new Track("testTrack1", new SectionTypes[]{SectionTypes.Finish});
+            Track testTrack1 = new Track("testTrack1", new SectionTypes[]{SectionTypes.Finish}, 1);
             Competition.Tracks.Enqueue(testTrack1);
             
             Track result = Competition.NextTrack();

@@ -7,11 +7,15 @@ namespace Model
     {
         public string Name { get; set; }
         public LinkedList<Section> Sections { get; set; }
+        public int StartDirection { get; set; }
+        
+        public int StartPosition { get; set; }
 
-        public Track(string name, SectionTypes[] sections)
+        public Track(string name, SectionTypes[] sections, int startDirection)
         {
             this.Name = name;
             Sections = SetSections(sections);
+            StartDirection = startDirection;
 
             // Adds the sections given in the constructor to the Sections
             // linkedlist property

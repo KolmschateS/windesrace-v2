@@ -10,7 +10,7 @@ namespace ControllerTest
         [SetUp]
         public void SetUp()
         {
-            Track = new Track("Test", new SectionTypes[] {SectionTypes.Finish});
+            Track = new Track("Test", new SectionTypes[] {SectionTypes.Finish}, 1);
         }
 
         [Test]
