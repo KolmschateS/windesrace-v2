@@ -37,11 +37,22 @@ namespace windesrace_v2
         // Function to call to draw the track
         public static void DrawTrack(Track track)
         {
+            try
+            {
+                Console.SetWindowSize(120, 60);
+            }
+            catch
+            {
+                Console.WriteLine("Can't set Windowsize");
+            }
+
             Direction = track.StartDirection;
             int [] startingPos = SetStartingPos(track);
 
             Console.Clear();
-            Console.SetCursorPosition( startingPos[0], startingPos[1]);
+            Console.WriteLine(track.Name + " | StartingPos: " + startingPos[0] + " " + startingPos[1]);
+            
+            Console.SetCursorPosition( startingPos[0], startingPos[1] + 5);
             
             Direction = track.StartDirection;
 
@@ -53,12 +64,8 @@ namespace windesrace_v2
                 Console.SetCursorPosition(Console.CursorLeft + cursorPos[0], Console.CursorTop + cursorPos[1]);
             }
             
-            Console.SetCursorPosition(0, startingPos[1] + 5);
-            Console.WriteLine(track.Name + " | StartingPos: " + startingPos[0] + " " + startingPos[1]);
             
-            Console.SetCursorPosition(startingPos[0], startingPos[1]);
-            Console.Write(".");
-            Console.SetCursorPosition(0, startingPos[1] + 15);
+            Console.SetCursorPosition(0, startingPos[1] + 40);
         }
 
         // Function to call to draw a section
@@ -71,6 +78,8 @@ namespace windesrace_v2
             }
         }
 
+        // Function to change direction based on the sectionType that is given
+        // Corners change it
         public static void ChangeDirection(SectionTypes sectiontype)
         {
             switch (sectiontype)
@@ -158,10 +167,10 @@ namespace windesrace_v2
         public static int[] SetStartingPos(Track track)
         {
             int[] currentPos = new int[] {0, 0};
-            int[] startingPos = new int[] {0, 0};
+            int[] startingPos = new int[] { 0, 0 };
+
             foreach (var section in track.Sections)
             {
-                
                 // Imitating the writing of the section. Y gets + 4
                 currentPos[1] += 4;
                 ChangeDirection(section.SectionType);
@@ -169,28 +178,25 @@ namespace windesrace_v2
                 // Gets the instruction what the edit should be
                 int[] change = ChangeCursorPos();
 
-                if (currentPos[0] + change[0] < 0)
+                for (int i = 0; i < currentPos.Length; i++)
                 {
-                    startingPos[0] += change[0];
-                }
-                if (currentPos[1] + change[1] < 0)
-                {
-                    startingPos[1] += change[1];
-                }
-                else
-                {
-                    currentPos[1] -= 4;
+                    if (currentPos[i] + change[i] < startingPos[i])
+                    {
+                        startingPos[i] = currentPos[i] + change[i];
+                    }
+                    currentPos[i] += change[i];
                 }
             }
 
-            // Set absolute numbers
-            startingPos[0] = Math.Abs(startingPos[0]);
-            startingPos[1] = Math.Abs((startingPos[1]));
+            for(int i = 0; i < startingPos.Length; i++)
+            {
+                startingPos[i] = Math.Abs(startingPos[i]);
+            }
+
             return startingPos;
         }
         
         // SetGraphics is the function that sets the two-key dictionary
-        // 
         public static void SetGraphics()
         {
             Graphics = new Dictionary<(int, SectionTypes), string[]>();

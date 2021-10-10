@@ -36,7 +36,7 @@ namespace Controller
                 SectionTypes.RightCorner,
                 
             }, 3);
-            // Tracks.Add(Earth.Name, Earth);
+            Tracks.Add(Earth.Name, Earth);
 
             Track Sun = new Track("Sun", new SectionTypes[]
             {
@@ -75,7 +75,8 @@ namespace Controller
                 SectionTypes.Straight,
                 SectionTypes.RightCorner,
                 SectionTypes.Straight,
-            }, 1);
+                SectionTypes.Straight,
+            }, 2);
             Tracks.Add(Sun.Name, Sun);
 
             Track Pluto = new Track("Pluto", new SectionTypes[]

@@ -9,13 +9,13 @@ namespace windesrace_v2
         static void Main(string[] args)
         {
             Data.Initialize();
-            // for (; ; )
-            // {
+            for (; ; )
+            {
                 Thread.Sleep(2000);
                 Data.NextRace();
                 Visualisation.Initialize();
                 Visualisation.DrawTrack(Data.CurrentRace.Track);
-            // }
+            }
         }
     }
 }
