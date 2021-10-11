@@ -23,11 +23,11 @@ namespace windesrace_v2
         //      ↓
         // 3: <----
         // The default value is one, which is set in the Initialize function
-        public static int Direction;
+        public static int Direction { get; set; }
 
         // The Two-key dictionary works as following:
         // Dictionary<(int direction, Sectiontypes sectiontype), String[] SectionString>
-        public static Dictionary<(int, SectionTypes), string[]> Graphics;
+        public static Dictionary<(int, SectionTypes), string[]> Graphics { get; set; }
 
         public static void Initialize()
         {
@@ -37,28 +37,47 @@ namespace windesrace_v2
         // Function to call to draw the track
         public static void DrawTrack(Track track)
         {
+            try
+            {
+                Console.SetWindowSize(120, 60);
+            }
+            catch
+            {
+                Console.WriteLine("Can't set Windowsize");
+            }
+
+            // Gets the Direction from the currentTrack, "starting position"
+            // SetStartingPos draws the track virtually and calculates from where
+            // the track should be drawn for it to remain within the limits
             Direction = track.StartDirection;
             int [] startingPos = SetStartingPos(track);
 
+            // Clears the console to make reset the canvas and writes the current trackname
+            // 
             Console.Clear();
-            Console.SetCursorPosition( startingPos[0], startingPos[1]);
-            
+            Console.Write(track.Name);
+
+            // Sets the a little more to the bottom, so there is a space between
+            // the trackname and the track
+            Console.SetCursorPosition( startingPos[0], startingPos[1] + 5);
+
+            // After SetStartingPos the Direction changed. Resetting this will prep
+            // it for the actual drawing of the track.
             Direction = track.StartDirection;
 
+            // For each section in the track
             foreach (Section section in track.Sections)
             {
+                // The section is drawn, by getting from the Graphic dictionary
+                // by inserting the current direction and the sectiontype
                 DrawSection(Graphics[(Direction, section.SectionType)]);
+
+                // After drawing the direction is changed based on the sectiontype
+                // (if it's a corner the direction obviously changes)
                 ChangeDirection(section.SectionType);
                 int[] cursorPos = ChangeCursorPos();
                 Console.SetCursorPosition(Console.CursorLeft + cursorPos[0], Console.CursorTop + cursorPos[1]);
             }
-            
-            Console.SetCursorPosition(0, startingPos[1] + 5);
-            Console.WriteLine(track.Name + " | StartingPos: " + startingPos[0] + " " + startingPos[1]);
-            
-            Console.SetCursorPosition(startingPos[0], startingPos[1]);
-            Console.Write(".");
-            Console.SetCursorPosition(0, startingPos[1] + 15);
         }
 
         // Function to call to draw a section
@@ -71,6 +90,8 @@ namespace windesrace_v2
             }
         }
 
+        // Function to change direction based on the sectionType that is given
+        // Corners change it
         public static void ChangeDirection(SectionTypes sectiontype)
         {
             switch (sectiontype)
@@ -154,14 +175,13 @@ namespace windesrace_v2
             }
         }
         
-        // TODO fix this function. Y axis not working properly
         public static int[] SetStartingPos(Track track)
         {
-            int[] currentPos = new int[] {0, 0};
-            int[] startingPos = new int[] {0, 0};
+            int[] currentPos = {0, 0};
+            int[] startingPos = { 0, 0 };
+
             foreach (var section in track.Sections)
             {
-                
                 // Imitating the writing of the section. Y gets + 4
                 currentPos[1] += 4;
                 ChangeDirection(section.SectionType);
@@ -169,28 +189,25 @@ namespace windesrace_v2
                 // Gets the instruction what the edit should be
                 int[] change = ChangeCursorPos();
 
-                if (currentPos[0] + change[0] < 0)
+                for (int i = 0; i < currentPos.Length; i++)
                 {
-                    startingPos[0] += change[0];
-                }
-                if (currentPos[1] + change[1] < 0)
-                {
-                    startingPos[1] += change[1];
-                }
-                else
-                {
-                    currentPos[1] -= 4;
+                    if (currentPos[i] + change[i] < startingPos[i])
+                    {
+                        startingPos[i] = currentPos[i] + change[i];
+                    }
+                    currentPos[i] += change[i];
                 }
             }
 
-            // Set absolute numbers
-            startingPos[0] = Math.Abs(startingPos[0]);
-            startingPos[1] = Math.Abs((startingPos[1]));
+            for(int i = 0; i < startingPos.Length; i++)
+            {
+                startingPos[i] = Math.Abs(startingPos[i]);
+            }
+
             return startingPos;
         }
         
         // SetGraphics is the function that sets the two-key dictionary
-        // 
         public static void SetGraphics()
         {
             Graphics = new Dictionary<(int, SectionTypes), string[]>();
@@ -328,5 +345,6 @@ namespace windesrace_v2
             Graphics.Add((2, SectionTypes.LeftCorner), cornerBottomLeft);
             Graphics.Add((3, SectionTypes.RightCorner), cornerBottomLeft);
         }
+        
     }
 }
