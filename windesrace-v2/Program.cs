@@ -9,12 +9,20 @@ namespace windesrace_v2
         static void Main(string[] args)
         {
             Data.Initialize();
-            for (; ; )
+            Visualisation.Initialize();
+            for (;;)
             {
                 Thread.Sleep(2000);
                 Data.NextRace();
-                Visualisation.Initialize();
-                Visualisation.DrawTrack(Data.CurrentRace.Track);
+                try
+                {
+                    Visualisation.DrawTrack(Data.CurrentRace.Track);
+                }
+                catch (Exception e)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Races are over");
+                }
             }
         }
     }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Model
 {
@@ -8,8 +7,6 @@ namespace Model
         public string Name { get; set; }
         public LinkedList<Section> Sections { get; set; }
         public int StartDirection { get; set; }
-        
-        public int StartPosition { get; set; }
 
         public Track(string name, SectionTypes[] sections, int startDirection)
         {

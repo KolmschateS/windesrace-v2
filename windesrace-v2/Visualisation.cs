@@ -23,11 +23,11 @@ namespace windesrace_v2
         //      ↓
         // 3: <----
         // The default value is one, which is set in the Initialize function
-        public static int Direction;
+        public static int Direction { get; set; }
 
         // The Two-key dictionary works as following:
         // Dictionary<(int direction, Sectiontypes sectiontype), String[] SectionString>
-        public static Dictionary<(int, SectionTypes), string[]> Graphics;
+        public static Dictionary<(int, SectionTypes), string[]> Graphics { get; set; }
 
         public static void Initialize()
         {
@@ -46,26 +46,38 @@ namespace windesrace_v2
                 Console.WriteLine("Can't set Windowsize");
             }
 
+            // Gets the Direction from the currentTrack, "starting position"
+            // SetStartingPos draws the track virtually and calculates from where
+            // the track should be drawn for it to remain within the limits
             Direction = track.StartDirection;
             int [] startingPos = SetStartingPos(track);
 
+            // Clears the console to make reset the canvas and writes the current trackname
+            // 
             Console.Clear();
-            Console.WriteLine(track.Name + " | StartingPos: " + startingPos[0] + " " + startingPos[1]);
-            
+            Console.Write(track.Name);
+
+            // Sets the a little more to the bottom, so there is a space between
+            // the trackname and the track
             Console.SetCursorPosition( startingPos[0], startingPos[1] + 5);
-            
+
+            // After SetStartingPos the Direction changed. Resetting this will prep
+            // it for the actual drawing of the track.
             Direction = track.StartDirection;
 
+            // For each section in the track
             foreach (Section section in track.Sections)
             {
+                // The section is drawn, by getting from the Graphic dictionary
+                // by inserting the current direction and the sectiontype
                 DrawSection(Graphics[(Direction, section.SectionType)]);
+
+                // After drawing the direction is changed based on the sectiontype
+                // (if it's a corner the direction obviously changes)
                 ChangeDirection(section.SectionType);
                 int[] cursorPos = ChangeCursorPos();
                 Console.SetCursorPosition(Console.CursorLeft + cursorPos[0], Console.CursorTop + cursorPos[1]);
             }
-            
-            
-            Console.SetCursorPosition(0, startingPos[1] + 40);
         }
 
         // Function to call to draw a section
@@ -163,11 +175,10 @@ namespace windesrace_v2
             }
         }
         
-        // TODO fix this function. Y axis not working properly
         public static int[] SetStartingPos(Track track)
         {
-            int[] currentPos = new int[] {0, 0};
-            int[] startingPos = new int[] { 0, 0 };
+            int[] currentPos = {0, 0};
+            int[] startingPos = { 0, 0 };
 
             foreach (var section in track.Sections)
             {
@@ -334,5 +345,6 @@ namespace windesrace_v2
             Graphics.Add((2, SectionTypes.LeftCorner), cornerBottomLeft);
             Graphics.Add((3, SectionTypes.RightCorner), cornerBottomLeft);
         }
+        
     }
 }

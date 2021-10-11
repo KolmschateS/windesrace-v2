@@ -81,6 +81,9 @@ namespace Controller
 
             Track Pluto = new Track("Pluto", new SectionTypes[]
             {
+                SectionTypes.StartGrid,
+                SectionTypes.Finish,
+                SectionTypes.Straight,
                 SectionTypes.Straight,
                 SectionTypes.RightCorner,
                 SectionTypes.Straight,
@@ -88,7 +91,14 @@ namespace Controller
                 SectionTypes.Straight,
                 SectionTypes.RightCorner,
                 SectionTypes.Straight,
-                SectionTypes.RightCorner,
+                SectionTypes.Straight,
+                SectionTypes.Straight,
+                SectionTypes.LeftCorner,
+                SectionTypes.Straight,
+                SectionTypes.Straight,
+                SectionTypes.LeftCorner,
+                SectionTypes.Straight,
+                SectionTypes.LeftCorner,
             }, 2);
             Tracks.Add(Pluto.Name, Pluto);
 
@@ -101,7 +111,7 @@ namespace Controller
             Track Uranus = new Track("Uranus", new SectionTypes[]
             {
                 SectionTypes.Straight
-            }, 1);
+            }, 0);
             Tracks.Add(Uranus.Name, Uranus);
 
             Track Jupiter = new Track("Jupiter", new SectionTypes[]
