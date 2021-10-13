@@ -218,7 +218,7 @@ namespace windesrace_v2
             // +##+
             // +  +
             // +  +
-            string[] finish0Vertical = {"+  +", "+##+", "+  +", "+  +"};
+            string[] finish0Vertical = { "║  ║", "║▒▒║", "║  ║", "║  ║"};
             Graphics.Add((0, SectionTypes.Finish), finish0Vertical);
 
             // Direction = 1
@@ -227,7 +227,7 @@ namespace windesrace_v2
             //   #
             //   #
             // ++++
-            string[] finish1Horizontal = {"++++", "  # ", "  # ", "++++"};
+            string[] finish1Horizontal = { "════", "  ▒ ", "  ▒ ", "════" };
             Graphics.Add((1, SectionTypes.Finish), finish1Horizontal);
 
             // Direction = 2
@@ -236,7 +236,7 @@ namespace windesrace_v2
             // +  +
             // +##+
             // +  +
-            string[] finish2Vertical = {"+  +", "+  +", "+##+", "+  +"};
+            string[] finish2Vertical = {"║  ║", "║  ║", "║▒▒║", "║  ║"};
             Graphics.Add((2, SectionTypes.Finish), finish2Vertical);
 
             // Finish horizontal 3
@@ -244,7 +244,7 @@ namespace windesrace_v2
             //  #
             //  #
             // ++++
-            string[] finish3Horizontal = {"++++", " #  ", " #  ", "++++"};
+            string[] finish3Horizontal = {"════", " ▒  ", " ▒  ", "════"};
             Graphics.Add((3, SectionTypes.Finish), finish3Horizontal);
             
             // Direction = 0
@@ -253,7 +253,7 @@ namespace windesrace_v2
             // + _+
             // +_ +
             // + _+
-            string[] start0Vertical = {"+_ +", "+ _+", "+_ +", "+ _+"};
+            string[] start0Vertical = {"║_ ║", "║ _║", "║_ ║", "║ _║"};
             Graphics.Add((0, SectionTypes.StartGrid), start0Vertical);
             
             // Direction = 1
@@ -262,7 +262,7 @@ namespace windesrace_v2
             //  | |
             // | |
             // ++++
-            string[] start1Horizontal = {"++++", " ] ]", "] ] ", "++++"};
+            string[] start1Horizontal = {"════", " ] ]", "] ] ", "════"};
             Graphics.Add((1, SectionTypes.StartGrid), start1Horizontal);
             
             // Direction = 2
@@ -271,7 +271,7 @@ namespace windesrace_v2
             // +_ +
             // + _+
             // +_ +
-            string[] start2Vertical = {"+ _+", "+_ +", "+ _+", "+_ +"};
+            string[] start2Vertical = {"║ _║", "║_ ║", "║ _║", "║_ ║"};
             Graphics.Add((2, SectionTypes.StartGrid), start2Vertical);
             
             // Direction = 3
@@ -280,7 +280,7 @@ namespace windesrace_v2
             // | |
             //  | |
             // ++++
-            string[] start3Horizontal = {"++++", "] ] ", " ] ]", "++++"};
+            string[] start3Horizontal = {"════", "] ] ", " ] ]", "════"};
             Graphics.Add((3, SectionTypes.StartGrid), start3Horizontal);
 
 
@@ -290,7 +290,7 @@ namespace windesrace_v2
             //    
             //    
             // ++++
-            string[] straightHorizontal = {"++++", "    ", "    ", "++++"};
+            string[] straightHorizontal = {"════", "    ", "    ", "════"};
             Graphics.Add((1, SectionTypes.Straight), straightHorizontal);
             Graphics.Add((3, SectionTypes.Straight), straightHorizontal);
 
@@ -301,7 +301,7 @@ namespace windesrace_v2
             // +  +
             // +  +
             // +  +
-            string[] straightVertical = {"+  +", "+  +", "+  +", "+  +"};
+            string[] straightVertical = {"║  ║", "║  ║", "║  ║", "║  ║"};
             Graphics.Add((0, SectionTypes.Straight), straightVertical);
             Graphics.Add((2, SectionTypes.Straight), straightVertical);
 
@@ -311,7 +311,7 @@ namespace windesrace_v2
             // +   
             // +   
             // +  +
-            string[] cornerTopRight = {"++++", "+   ", "+   ", "+  +"};
+            string[] cornerTopRight = {"╔═══", "║   ", "║   ", "║  ╔"};
             Graphics.Add((0, SectionTypes.RightCorner), cornerTopRight);
             Graphics.Add((3, SectionTypes.LeftCorner), cornerTopRight);
 
@@ -321,7 +321,7 @@ namespace windesrace_v2
             //    +
             //    +
             // +  +
-            string[] cornerTopLeft = {"++++", "   +", "   +", "+  +"};
+            string[] cornerTopLeft = {"═══╗", "   ║", "   ║", "╗  ║"};
             Graphics.Add((0, SectionTypes.LeftCorner), cornerTopLeft);
             Graphics.Add((1, SectionTypes.RightCorner), cornerTopLeft);
             
@@ -331,7 +331,7 @@ namespace windesrace_v2
             //    +
             //    +
             // ++++
-            string[] cornerBottomRight = {"+  +", "   +", "   +", "++++"};
+            string[] cornerBottomRight = {"╝  ║", "   ║", "   ║", "═══╝"};
             Graphics.Add((1, SectionTypes.LeftCorner), cornerBottomRight);
             Graphics.Add((2, SectionTypes.RightCorner), cornerBottomRight);
             
@@ -341,7 +341,7 @@ namespace windesrace_v2
             // +   
             // +   
             // ++++
-            string[] cornerBottomLeft = {"+  +", "+   ", "+   ", "++++"};
+            string[] cornerBottomLeft = {"║  ╚", "║   ", "║   ", "╚═══"};
             Graphics.Add((2, SectionTypes.LeftCorner), cornerBottomLeft);
             Graphics.Add((3, SectionTypes.RightCorner), cornerBottomLeft);
         }
