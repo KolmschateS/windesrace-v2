@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Channels;
 using Model;
 namespace Controller
 {
@@ -9,32 +11,31 @@ namespace Controller
         public List<IParticipant> Pilots { get; set; }
         public DateTime StartTime { get; set; }
 
-        private Random _random { get; set; } 
-        private Dictionary<Section, SectionData> _positions { get; set; }
+        private Random Random { get; set; } 
+        private Dictionary<Section, SectionData> Positions { get; set; }
 
         // Constructor
         public Race(Track track, List<IParticipant> pilots)
         {
-            Track = track;
             Pilots = pilots;
+            Random = new Random(DateTime.Now.Millisecond);
+            Track = track;
             StartTime = DateTime.Now;
-            _random = new Random(DateTime.Now.Millisecond);
-
-            //TODO RandomizeEquipement?
+            GenerateQualificationList();
         }
 
         // Method to read SectionData
         public SectionData GetSectionData(Section section)
         {
-            if(_positions[section] == null)
+            if(Positions[section] == null)
             {
                 SectionData newData = new SectionData();
-                _positions.Add(section, newData);
+                Positions.Add(section, newData);
                 return newData;
             }
             else
             { 
-                return _positions[section];
+                return Positions[section];
             }
         }
 
@@ -42,12 +43,22 @@ namespace Controller
         // For each pilot the equipement will be inserted with a random Integer
         public void RandomizeEquipement()
         {
-            foreach (Astronaut pilot in Pilots)
+            Pilots.ForEach(i => Console.Write("{0}\n", i.Name + " " + i.Equipment.Speed));
+            foreach (IParticipant pilot in Pilots)
             {
-                pilot.Equipment.Performance = _random.Next();
-                pilot.Equipment.Quality = _random.Next();
-                pilot.Equipment.Speed = _random.Next();
+                pilot.Equipment.RandomizeEquipment(Random);
             }
+            Pilots.ForEach(i => Console.Write("{0}\n", i.Name + " " + i.Equipment.Speed));
+        }
+
+        public void GenerateQualificationList()
+        {
+            RandomizeEquipement();
+            Console.WriteLine();
+            Pilots.ForEach(i => Console.Write("{0}\n", i.Name + " " + i.Equipment.Speed));
+            Pilots = Pilots.OrderByDescending(o => o.Equipment.Speed).Take(Track.GridSize).ToList();
+            Console.WriteLine(Track.Name + "Qualification");
+            Pilots.ForEach(i => Console.Write("{0}\n", i.Name + " " + i.Equipment.Speed));
         }
     }
 }

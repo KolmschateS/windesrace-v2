@@ -13,7 +13,7 @@ namespace Controller
         public static void Initialize()
         {
             competition = new Competition();
-            AddParticipantsToCompetition(5);
+            AddParticipantsToCompetition(12);
             AddTracksToCompetition();
         }
 
