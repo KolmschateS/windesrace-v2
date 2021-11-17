@@ -36,8 +36,9 @@ namespace windesrace_v2
         }
 
         // Function to call to draw the track
-        public static void DrawTrack(Track track)
+        public static void DrawTrack(Race race)
         {
+            Track track = race.Track;
             try
             {
                 Console.SetWindowSize(120, 60);
@@ -71,7 +72,7 @@ namespace windesrace_v2
             {
                 // The section is drawn, by getting from the Graphic dictionary
                 // by inserting the current direction and the sectiontype
-                DrawSection(section);
+                DrawTrackSection(section, race.GetSectionData(section));
 
                 // After drawing the direction is changed based on the sectiontype
                 // (if it's a corner the direction obviously changes)
@@ -82,16 +83,28 @@ namespace windesrace_v2
         }
 
         // Function to call to draw a section
-        public static void DrawSection(Section section)
+        public static void DrawTrackSection(Section section, SectionData sectionData)
         {
             string[] sectionstring = Graphics[(Direction, section.SectionType)];
             foreach (string row in sectionstring)
             {
-                Console.Write(row);
+                string result = SetSectionstring(row, sectionData.Left, sectionData.Right);
+                Console.Write(result);
                 Console.SetCursorPosition(Console.CursorLeft - 4, Console.CursorTop + 1);
             }
         }
 
+        public static string SetSectionstring(string sectionString, IParticipant left, IParticipant right)
+        {
+            // If the particpants != null and the string contains L, replace the L with the leftParticipant Initial
+            if (left != null && sectionString.Contains("L")) return sectionString.Replace("L", left.Initial);
+            
+            // If the particpants != null and the string contains L, replace the L with the rightParticipant Initial
+            if (right != null && sectionString.Contains("R")) return sectionString.Replace("R", right.Initial);
+
+            return sectionString.Contains("L") ? sectionString.Replace("L", " ") : sectionString.Replace("R", " ");
+        }
+        
 
         // Function to change direction based on the sectionType that is given
         // Corners change it
@@ -211,7 +224,7 @@ namespace windesrace_v2
             // +##+
             // +  +
             // +  +
-            string[] finish0Vertical = { "║  ║", "║▒▒║", "║  ║", "║  ║"};
+            string[] finish0Vertical = { "║  ║", "║▒▒║", "║L ║", "║ R║"};
             Graphics.Add((0, SectionTypes.Finish), finish0Vertical);
 
             // Direction = 1
@@ -220,7 +233,7 @@ namespace windesrace_v2
             //   #
             //   #
             // ++++
-            string[] finish1Horizontal = { "════", "  ▒ ", "  ▒ ", "════" };
+            string[] finish1Horizontal = { "════", " L▒ ", "R ▒ ", "════" };
             Graphics.Add((1, SectionTypes.Finish), finish1Horizontal);
 
             // Direction = 2
@@ -229,7 +242,7 @@ namespace windesrace_v2
             // +  +
             // +##+
             // +  +
-            string[] finish2Vertical = {"║  ║", "║  ║", "║▒▒║", "║  ║"};
+            string[] finish2Vertical = {"║R ║", "║ L║", "║▒▒║", "║  ║"};
             Graphics.Add((2, SectionTypes.Finish), finish2Vertical);
 
             // Finish horizontal 3
@@ -237,34 +250,34 @@ namespace windesrace_v2
             //  #
             //  #
             // ++++
-            string[] finish3Horizontal = {"════", " ▒  ", " ▒  ", "════"};
+            string[] finish3Horizontal = {"════", " ▒L ", " ▒ R", "════"};
             Graphics.Add((3, SectionTypes.Finish), finish3Horizontal);
             
             // Direction = 0
             // Starting grid vertical
             // +_ +
+            // +L +
             // + _+
-            // +_ +
-            // + _+
-            string[] start0Vertical = {"║_ ║", "║ _║", "║_ ║", "║ _║"};
+            // + R+
+            string[] start0Vertical = {"║_ ║", "║L ║", "║ _║", "║ R║"};
             Graphics.Add((0, SectionTypes.StartGrid), start0Vertical);
             
             // Direction = 1
             // Starting grid horizontal
             // ++++
-            //  | |
-            // | |
+            //   L|
+            // R|
             // ++++
-            string[] start1Horizontal = {"════", " ] ]", "] ] ", "════"};
+            string[] start1Horizontal = {"════", "  L|", "R|  ", "════"};
             Graphics.Add((1, SectionTypes.StartGrid), start1Horizontal);
             
             // Direction = 2
             // Starting grid vertical
-            // + _+
+            // +R +
             // +_ +
+            // + L+
             // + _+
-            // +_ +
-            string[] start2Vertical = {"║ _║", "║_ ║", "║ _║", "║_ ║"};
+            string[] start2Vertical = {"║R ║", "║_ ║", "║ L║", "║ _║"};
             Graphics.Add((2, SectionTypes.StartGrid), start2Vertical);
             
             // Direction = 3
@@ -273,7 +286,7 @@ namespace windesrace_v2
             // | |
             //  | |
             // ++++
-            string[] start3Horizontal = {"════", "] ] ", " ] ]", "════"};
+            string[] start3Horizontal = {"════", "  |R", "|L  ", "════"};
             Graphics.Add((3, SectionTypes.StartGrid), start3Horizontal);
 
 
@@ -283,7 +296,8 @@ namespace windesrace_v2
             //    
             //    
             // ++++
-            string[] straightHorizontal = {"════", "    ", "    ", "════"};
+            //TODO split because of L and R
+            string[] straightHorizontal = {"════", " L  ", "  R ", "════"};
             Graphics.Add((1, SectionTypes.Straight), straightHorizontal);
             Graphics.Add((3, SectionTypes.Straight), straightHorizontal);
 
@@ -294,47 +308,47 @@ namespace windesrace_v2
             // +  +
             // +  +
             // +  +
-            string[] straightVertical = {"║  ║", "║  ║", "║  ║", "║  ║"};
+            string[] straightVertical = {"║  ║", "║L ║", "║ R║", "║  ║"};
             Graphics.Add((0, SectionTypes.Straight), straightVertical);
             Graphics.Add((2, SectionTypes.Straight), straightVertical);
 
             // Direction = 0 or 2
             // Corner like a top right corner
             // ++++
-            // +   
-            // +   
+            // +L  
+            // + R
             // +  +
-            string[] cornerTopRight = {"╔═══", "║   ", "║   ", "║  ╔"};
+            string[] cornerTopRight = {"╔═══", "║L  ", "║ R ", "║  ╔"};
             Graphics.Add((0, SectionTypes.RightCorner), cornerTopRight);
             Graphics.Add((3, SectionTypes.LeftCorner), cornerTopRight);
 
             // Direction = 0 or 1
             // Corner like a top left corner
             // ++++
-            //    +
-            //    +
+            //  L +
+            //   R+
             // +  +
-            string[] cornerTopLeft = {"═══╗", "   ║", "   ║", "╗  ║"};
+            string[] cornerTopLeft = {"═══╗", " L ║", "  R║", "╗  ║"};
             Graphics.Add((0, SectionTypes.LeftCorner), cornerTopLeft);
             Graphics.Add((1, SectionTypes.RightCorner), cornerTopLeft);
             
             // Direction = 1 or 2
             // Corner like a bottom right corner
             // +  +
-            //    +
-            //    +
+            //  R +
+            //   L+
             // ++++
-            string[] cornerBottomRight = {"╝  ║", "   ║", "   ║", "═══╝"};
+            string[] cornerBottomRight = {"╝  ║", " R ║", "  L║", "═══╝"};
             Graphics.Add((1, SectionTypes.LeftCorner), cornerBottomRight);
             Graphics.Add((2, SectionTypes.RightCorner), cornerBottomRight);
             
             // Direction = 2 or 3
             // Corner like a bottom left corner
             // +  +
-            // +   
-            // +   
+            // + L 
+            // +R  
             // ++++
-            string[] cornerBottomLeft = {"║  ╚", "║   ", "║   ", "╚═══"};
+            string[] cornerBottomLeft = {"║  ╚", "║ L ", "║R  ", "╚═══"};
             Graphics.Add((2, SectionTypes.LeftCorner), cornerBottomLeft);
             Graphics.Add((3, SectionTypes.RightCorner), cornerBottomLeft);
         }
