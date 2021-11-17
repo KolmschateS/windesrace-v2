@@ -7,11 +7,11 @@ namespace Controller
     // Class that includes data for all the Tracks
     public class TrackData
     {
-        public Dictionary<String,Track> Tracks { get; set; }
+        public List<Track> Tracks { get; set; }
 
         public TrackData()
         {
-            Tracks = new Dictionary<string, Track>();
+            Tracks = new List<Track>();
             Track Earth = new Track("Earth", new SectionTypes[]
             {
                 SectionTypes.StartGrid,
@@ -33,10 +33,10 @@ namespace Controller
                 SectionTypes.Straight,
                 SectionTypes.Straight,
                 SectionTypes.RightCorner,
-                SectionTypes.RightCorner,
+                SectionTypes.RightCorner
                 
             }, 3);
-            Tracks.Add(Earth.Name, Earth);
+            Tracks.Add(Earth);
 
             Track Sun = new Track("Sun", new SectionTypes[]
             {
@@ -77,7 +77,7 @@ namespace Controller
                 SectionTypes.Straight,
                 SectionTypes.Straight,
             }, 2);
-            Tracks.Add(Sun.Name, Sun);
+            Tracks.Add(Sun);
 
             Track Pluto = new Track("Pluto", new SectionTypes[]
             {
@@ -99,26 +99,8 @@ namespace Controller
                 SectionTypes.LeftCorner,
                 SectionTypes.Straight,
                 SectionTypes.LeftCorner,
-            }, 2);
-            Tracks.Add(Pluto.Name, Pluto);
-
-            Track Mars = new Track("Mars", new SectionTypes[]
-            {
-                SectionTypes.Straight
-            }, 1);
-            Tracks.Add(Mars.Name, Mars);
-
-            Track Uranus = new Track("Uranus", new SectionTypes[]
-            {
-                SectionTypes.Straight
-            }, 0);
-            Tracks.Add(Uranus.Name, Uranus);
-
-            Track Jupiter = new Track("Jupiter", new SectionTypes[]
-            {
-                SectionTypes.Straight
-            }, 1);
-            Tracks.Add(Jupiter.Name, Jupiter);
+            }, 3);
+            Tracks.Add(Pluto);
         }
     }
 }

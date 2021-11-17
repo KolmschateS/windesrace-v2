@@ -15,14 +15,6 @@ namespace ControllerTest
         }
 
         [Test]
-        public void NextTrackEmptyQueueReturnNull()
-        {
-            // Should get the next track from the Competetition, no tracks are added so it should return null
-            var result = Competition.NextTrack();
-            Assert.IsNull(result);
-        }
-        
-        [Test]
         public void NextTrackOneInQueueReturnTrack()
         {
             // Adds a track to the competition
@@ -33,18 +25,7 @@ namespace ControllerTest
             var result = Competition.NextTrack();
             Assert.AreEqual(testTrack, result);
         }
-        
-        [Test]
-        public void NextTrackOneInQueueRemoveTrackFromQueue()
-        {
-            Track testTrack = new Track("testTrack", new SectionTypes[]{SectionTypes.Finish}, 1);
-            Competition.Tracks.Enqueue(testTrack);
-            
-            Track result = Competition.NextTrack();
-            result = Competition.NextTrack();
-            Assert.IsNull(result);
-        }
-        
+
         [Test]
         public void NextTrackTwoInQueueReturnNextTrack()
         {

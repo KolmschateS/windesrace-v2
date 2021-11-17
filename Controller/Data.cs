@@ -13,12 +13,13 @@ namespace Controller
         public static void Initialize()
         {
             competition = new Competition();
-            AddParticipantsToCompetition(5);
+            AddParticipantsToCompetition(12);
             AddTracksToCompetition();
         }
 
         public static void AddParticipantsToCompetition(int max)
         {
+            
             // Adds as much participants given with the method
             for (int i = 0; i < max; i++)
             {
@@ -31,9 +32,9 @@ namespace Controller
         public static void AddTracksToCompetition()
         {
             TrackData tracks = new TrackData();
-            foreach(KeyValuePair<String, Track> track in tracks.Tracks)
+            foreach(Track track in tracks.Tracks)
             {
-                competition.Tracks.Enqueue(track.Value);
+                competition.Tracks.Enqueue(track);
             }
         }
         // Method to initiate next race.

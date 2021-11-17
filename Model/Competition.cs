@@ -20,10 +20,7 @@ namespace Model
             {
                 return Tracks.Dequeue();
             }
-            else
-            {
-                return null;
-            }
+            throw(new Exception("Competition is finished"));
         }
     }
 }

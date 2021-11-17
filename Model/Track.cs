@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace Model
 {
@@ -7,12 +9,14 @@ namespace Model
         public string Name { get; set; }
         public LinkedList<Section> Sections { get; set; }
         public int StartDirection { get; set; }
+        public int GridSize { get; set; }
 
         public Track(string name, SectionTypes[] sections, int startDirection)
         {
-            this.Name = name;
+            Name = name;
             Sections = SetSections(sections);
             StartDirection = startDirection;
+            GridSize = SetGridSize();
 
             // Adds the sections given in the constructor to the Sections
             // linkedlist property
@@ -29,6 +33,52 @@ namespace Model
             }
 
             return sectionsList;
+        }
+
+        public int SetGridSize()
+        {
+            int count = 0;
+            foreach (Section section in Sections)
+            {
+                if (section.SectionType == SectionTypes.StartGrid)
+                {
+                    count += 2;
+                }
+            }
+
+            return count;
+        }
+
+        public LinkedListNode<Section> GetFinishNodeFromSections()
+        {
+            LinkedListNode<Section> node = Sections.First;
+            while (true)
+            {
+                if (node == null)
+                {
+                    throw new Exception("Node in GetFinishNodeFromSections is null");
+                }
+
+                if (node.Value.SectionType == SectionTypes.Finish)
+                {
+                    return node;
+                }
+
+                node = node.Next;
+            }
+        }
+        public List<Section> GetStartgrid()
+        {
+            LinkedListNode<Section> node = GetFinishNodeFromSections();
+            List<Section> result = new List<Section>();
+            while (true)
+            {
+                node = node.Previous ?? Sections.Last;
+                if (node.Value.SectionType == SectionTypes.Finish) break;
+
+                if (node.Value.SectionType == SectionTypes.StartGrid) result.Add(node.Value);
+            }
+            return result;
         }
     }
 }
