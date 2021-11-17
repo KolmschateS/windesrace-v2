@@ -118,7 +118,7 @@ namespace VisualisationTest
         public void D2StraightVertical()
         {
             string[] actual = Visualisation.Graphics[(2, SectionTypes.Straight)];
-            string[] expected = {"║R ║", "║_ ║", "║ L║", "║ _║"};
+            string[] expected = {"║  ║", "║L ║", "║ R║", "║  ║"};
 
             Assert.AreEqual(expected, actual);
         }

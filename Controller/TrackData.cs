@@ -101,24 +101,6 @@ namespace Controller
                 SectionTypes.LeftCorner,
             }, 3);
             Tracks.Add(Pluto);
-
-            Track Mars = new Track("Mars", new SectionTypes[]
-            {
-                SectionTypes.Straight
-            }, 1);
-            Tracks.Add(Mars);
-
-            Track Uranus = new Track("Uranus", new SectionTypes[]
-            {
-                SectionTypes.Straight
-            }, 0);
-            Tracks.Add(Uranus);
-
-            Track Jupiter = new Track("Jupiter", new SectionTypes[]
-            {
-                SectionTypes.Straight
-            }, 1);
-            Tracks.Add(Jupiter);
         }
     }
 }
