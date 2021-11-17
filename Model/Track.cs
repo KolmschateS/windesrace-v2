@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace Model
 {
@@ -45,6 +47,38 @@ namespace Model
             }
 
             return count;
+        }
+
+        public LinkedListNode<Section> GetFinishNodeFromSections()
+        {
+            LinkedListNode<Section> node = Sections.First;
+            while (true)
+            {
+                if (node == null)
+                {
+                    throw new Exception("Node in GetFinishNodeFromSections is null");
+                }
+
+                if (node.Value.SectionType == SectionTypes.Finish)
+                {
+                    return node;
+                }
+
+                node = node.Next;
+            }
+        }
+        public List<Section> GetStartgrid()
+        {
+            LinkedListNode<Section> node = GetFinishNodeFromSections();
+            List<Section> result = new List<Section>();
+            while (true)
+            {
+                node = node.Previous ?? Sections.Last;
+                if (node.Value.SectionType == SectionTypes.Finish) break;
+
+                if (node.Value.SectionType == SectionTypes.StartGrid) result.Add(node.Value);
+            }
+            return result;
         }
     }
 }

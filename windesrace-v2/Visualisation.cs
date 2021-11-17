@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.Intrinsics.X86;
+using Controller;
 using Model;
 
 namespace windesrace_v2
@@ -48,7 +49,7 @@ namespace windesrace_v2
 
             // Gets the Direction from the currentTrack, "starting position"
             // SetStartingPos draws the track virtually and calculates from where
-            // the track should be drawn for it to remain within the limits
+            // the track should be drawn for it to remain within the console windowsizes limits
             Direction = track.StartDirection;
             int [] startingPos = SetStartingPos(track);
 
@@ -57,7 +58,7 @@ namespace windesrace_v2
             Console.Clear();
             Console.Write(track.Name);
 
-            // Sets the a little more to the bottom, so there is a space between
+            // Sets the cursor a little more to the bottom, so there is a space between
             // the trackname and the track
             Console.SetCursorPosition( startingPos[0], startingPos[1] + 5);
 
@@ -70,7 +71,7 @@ namespace windesrace_v2
             {
                 // The section is drawn, by getting from the Graphic dictionary
                 // by inserting the current direction and the sectiontype
-                DrawSection(Graphics[(Direction, section.SectionType)]);
+                DrawSection(section);
 
                 // After drawing the direction is changed based on the sectiontype
                 // (if it's a corner the direction obviously changes)
@@ -81,14 +82,16 @@ namespace windesrace_v2
         }
 
         // Function to call to draw a section
-        public static void DrawSection(string[] sectionstring)
+        public static void DrawSection(Section section)
         {
+            string[] sectionstring = Graphics[(Direction, section.SectionType)];
             foreach (string row in sectionstring)
             {
                 Console.Write(row);
                 Console.SetCursorPosition(Console.CursorLeft - 4, Console.CursorTop + 1);
             }
         }
+
 
         // Function to change direction based on the sectionType that is given
         // Corners change it
@@ -97,29 +100,19 @@ namespace windesrace_v2
             switch (sectiontype)
             {
                 case SectionTypes.LeftCorner:
-                    if (Direction == 0)
-                    {
-                        Direction = 3;
-                        break;
-                    }
-                    else
-                    {
-                        Direction -= 1;
-                        break;
-                    }
+                    Direction -= 1;
+                    break;
+                
 
                 case SectionTypes.RightCorner:
-                    if (Direction == 3)
-                    {
-                        Direction = 0;
-                        break;
-                    }
-                    else
-                    {
-                        Direction += 1;
-                        break;
-                    }
+                    Direction += 1;
+                    break;
             }
+            Direction = Wrap(Direction, 4);
+        }
+        private static int Wrap(int x, int max)
+        {
+            return (x + max) % max;
         }
 
         // Function to set the cursor position to draw a section accordingly

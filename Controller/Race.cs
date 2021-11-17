@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Channels;
 using Model;
 namespace Controller
@@ -17,48 +18,71 @@ namespace Controller
         // Constructor
         public Race(Track track, List<IParticipant> pilots)
         {
-            Pilots = pilots;
             Random = new Random(DateTime.Now.Millisecond);
-            Track = track;
+            Positions = new Dictionary<Section, SectionData>();
             StartTime = DateTime.Now;
-            GenerateQualificationList();
+            Track = track;
+            Pilots = GenerateQualificationList(pilots);
+            SetPositions(track, Pilots);
         }
 
         // Method to read SectionData
         public SectionData GetSectionData(Section section)
         {
-            if(Positions[section] == null)
+            if(Positions.ContainsKey(section))
             {
-                SectionData newData = new SectionData();
-                Positions.Add(section, newData);
-                return newData;
-            }
-            else
-            { 
                 return Positions[section];
             }
+            SectionData newData = new SectionData();
+            Positions.Add(section, newData);
+            return newData;
         }
 
         // Methode to randomize the equipement from opponents
         // For each pilot the equipement will be inserted with a random Integer
-        public void RandomizeEquipement()
+        public List<IParticipant> RandomizeEquipement(List<IParticipant> pilots)
         {
-            Pilots.ForEach(i => Console.Write("{0}\n", i.Name + " " + i.Equipment.Speed));
-            foreach (IParticipant pilot in Pilots)
+            if (pilots == null) return new List<IParticipant>();
             {
-                pilot.Equipment.RandomizeEquipment(Random);
+                List<IParticipant> result = new List<IParticipant>();
+                foreach (IParticipant pilot in pilots)
+                {
+                    pilot.Equipment.RandomizeEquipment(Random);
+                    result.Add(pilot);
+                }
+                return result;
             }
-            Pilots.ForEach(i => Console.Write("{0}\n", i.Name + " " + i.Equipment.Speed));
+        }
+        public List<IParticipant> GenerateQualificationList(List<IParticipant> pilots)
+        {
+            List<IParticipant> randomPilots = RandomizeEquipement(pilots);
+            try
+            { 
+                return randomPilots.OrderByDescending(pilot => pilot.Equipment.Speed).Take(Track.GridSize).ToList();
+            }
+            catch (Exception e)
+            { 
+                Console.WriteLine("Whoops");
+                throw;
+            }
         }
 
-        public void GenerateQualificationList()
+        public void SetPositions(Track track, List<IParticipant> participants)
         {
-            RandomizeEquipement();
-            Console.WriteLine();
-            Pilots.ForEach(i => Console.Write("{0}\n", i.Name + " " + i.Equipment.Speed));
-            Pilots = Pilots.OrderByDescending(o => o.Equipment.Speed).Take(Track.GridSize).ToList();
-            Console.WriteLine(Track.Name + "Qualification");
-            Pilots.ForEach(i => Console.Write("{0}\n", i.Name + " " + i.Equipment.Speed));
+            List<Section> startgrid = track.GetStartgrid();
+            int place = 0;
+            
+            foreach (Section section in startgrid)
+            {
+                SectionData sectionData = GetSectionData(section);
+                if (place > participants.Count - 1) break;
+                sectionData.Left = participants[place];
+                
+                if (place + 1 > participants.Count - 1) break;
+                sectionData.Right = participants[place + 1];
+                place += 2;
+                Positions[section] = sectionData;
+            }
         }
     }
 }

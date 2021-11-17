@@ -12,10 +12,10 @@ namespace windesrace_v2
             Visualisation.Initialize();
             // for (;;)
             // {
-                Thread.Sleep(2000);
+            Thread.Sleep(2000);
                 Data.NextRace();
-                // Visualisation.DrawTrack(Data.CurrentRace.Track);
-            // }
+                Visualisation.DrawTrack(Data.CurrentRace.Track);
+                // }
         }
     }
 }
