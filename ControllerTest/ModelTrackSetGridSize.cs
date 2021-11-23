@@ -24,9 +24,12 @@ namespace ControllerTest
         [Test]
         public void SetGridSize4Test()
         {
-            track.Sections.AddLast(new Section(SectionTypes.StartGrid));
-            track.Sections.AddLast(new Section(SectionTypes.StartGrid));
-            track.GridSize = track.SetGridSize();
+            SectionTypes[] sections =
+            {
+                SectionTypes.StartGrid,
+                SectionTypes.StartGrid
+            };
+            track.GridSize = track.SetGridSize(sections);
             Assert.AreEqual(4, track.GridSize);
         }
     }

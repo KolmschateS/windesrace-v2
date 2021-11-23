@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -35,65 +36,41 @@ namespace windesrace_v2
             SetGraphics();
         }
 
-        // Function to call to draw the track
-        public static void DrawTrack(Race race)
+        public static void DrawRace(Race race)
         {
-            Track track = race.Track;
-            try
+            foreach (Section section in race.Track.Sections)
             {
-                Console.SetWindowSize(120, 60);
+                SectionData sectionData =  race.GetSectionData(section);
+                if (sectionData.Left != null && sectionData.Right != null)
+                {
+                    Console.SetCursorPosition(section.X, section.Y);
+                    DrawSection(section, section.Direction, sectionData.Left, sectionData.Right);
+                }
             }
-            catch
-            {
-                Console.WriteLine("Can't set Windowsize");
-            }
-
-            // Gets the Direction from the currentTrack, "starting position"
-            // SetStartingPos draws the track virtually and calculates from where
-            // the track should be drawn for it to remain within the console windowsizes limits
-            Direction = track.StartDirection;
-            int [] startingPos = SetStartingPos(track);
-
-            // Clears the console to make reset the canvas and writes the current trackname
-            // 
+        }
+        // Function to call to draw the track
+        public static void DrawTrack(Track track)
+        {
             Console.Clear();
-            Console.Write(track.Name);
-
-            // Sets the cursor a little more to the bottom, so there is a space between
-            // the trackname and the track
-            Console.SetCursorPosition( startingPos[0], startingPos[1] + 5);
-
-            // After SetStartingPos the Direction changed. Resetting this will prep
-            // it for the actual drawing of the track.
-            Direction = track.StartDirection;
-
-            // For each section in the track
             foreach (Section section in track.Sections)
             {
-                // The section is drawn, by getting from the Graphic dictionary
-                // by inserting the current direction and the sectiontype
-                DrawTrackSection(section, race.GetSectionData(section));
-
-                // After drawing the direction is changed based on the sectiontype
-                // (if it's a corner the direction obviously changes)
-                ChangeDirection(section.SectionType);
-                int[] cursorPos = ChangeCursorPos();
-                Console.SetCursorPosition(Console.CursorLeft + cursorPos[0], Console.CursorTop + cursorPos[1]);
+                Console.SetCursorPosition(section.X, section.Y);
+                DrawSection(section, section.Direction, null, null);
             }
         }
 
-        // Function to call to draw a section
-        public static void DrawTrackSection(Section section, SectionData sectionData)
+        public static void DrawSection(Section section, int direction, IParticipant leftParticipant, IParticipant rightParticipant)
         {
-            string[] sectionstring = Graphics[(Direction, section.SectionType)];
-            foreach (string row in sectionstring)
+            string[] DrawString = Graphics[(direction, section.SectionType)];
+            // Console.WriteLine($"X: {section.X} Y: {section.Y} Dir: {section.Direction}");
+            foreach (string line in DrawString)
             {
-                string result = SetSectionstring(row, sectionData.Left, sectionData.Right);
-                Console.Write(result);
-                Console.SetCursorPosition(Console.CursorLeft - 4, Console.CursorTop + 1);
+                Console.Write(SetSectionstring(line, leftParticipant, rightParticipant ));
+                Console.CursorTop += 1;
+                Console.CursorLeft -= 4;
             }
+            Console.CursorTop -= 4;
         }
-
         public static string SetSectionstring(string sectionString, IParticipant left, IParticipant right)
         {
             // If the particpants != null and the string contains L, replace the L with the leftParticipant Initial
@@ -104,115 +81,7 @@ namespace windesrace_v2
 
             return sectionString.Contains("L") ? sectionString.Replace("L", " ") : sectionString.Replace("R", " ");
         }
-        
 
-        // Function to change direction based on the sectionType that is given
-        // Corners change it
-        public static void ChangeDirection(SectionTypes sectiontype)
-        {
-            switch (sectiontype)
-            {
-                case SectionTypes.LeftCorner:
-                    Direction -= 1;
-                    break;
-                
-
-                case SectionTypes.RightCorner:
-                    Direction += 1;
-                    break;
-            }
-            Direction = Wrap(Direction, 4);
-        }
-        private static int Wrap(int x, int max)
-        {
-            return (x + max) % max;
-        }
-
-        // Function to set the cursor position to draw a section accordingly
-        public static int[] ChangeCursorPos()
-        {
-            switch (Direction)
-            {
-                // Direction is 0
-                //   1234
-                // 0 +           Cursor should go from 0,8 to 0,0 to draw a section with direction 0
-                // 1   
-                // 2                                    ^
-                // 3                                    |
-                // 4 ....                               |
-                // 5 ....                               |
-                // 6 ....
-                // 7 ....
-                // 8 +
-                case 0: 
-                    return new int[]{0, -8};
-                
-                // Direction is 1
-                //   12345678
-                // 0 ....+...      Cursor should go from 5,4 to 5,0 to draw a section with direction 0
-                // 1 ........  
-                // 2 ........                          ---->     
-                // 3 ........
-                // 4 +       
-                case 1:
-                    return new int[]{4, -4};
-                
-                // Direction is 2
-                //   1234
-                // 0 ....           Cursor should stay where it is
-                // 1 ....                       |
-                // 2 ....                       |
-                // 3 ....                       |
-                // 4 +                          ↓
-                case 2: 
-                    return new int[]{0, 0};
-                
-                // Direction is 3
-                //   01234567
-                // 0 +.......      Cursos should go from 4,4 to 0,0 to draw a section with direction 3
-                // 1 ........  
-                // 2 ........                       <----
-                // 3 ........
-                // 4     +   
-                case 3:
-                    return new int[]{-4, -4};
-                default:
-                    return new int[]{10, 10};
-            }
-        }
-        
-        public static int[] SetStartingPos(Track track)
-        {
-            int[] currentPos = {0, 0};
-            int[] startingPos = { 0, 0 };
-
-            foreach (var section in track.Sections)
-            {
-                // Imitating the writing of the section. Y gets + 4
-                currentPos[1] += 4;
-                ChangeDirection(section.SectionType);
-                
-                // Gets the instruction what the edit should be
-                int[] change = ChangeCursorPos();
-
-                for (int i = 0; i < currentPos.Length; i++)
-                {
-                    if (currentPos[i] + change[i] < startingPos[i])
-                    {
-                        startingPos[i] = currentPos[i] + change[i];
-                    }
-                    currentPos[i] += change[i];
-                }
-            }
-
-            for(int i = 0; i < startingPos.Length; i++)
-            {
-                startingPos[i] = Math.Abs(startingPos[i]);
-            }
-
-            return startingPos;
-        }
-        
         // SetGraphics is the function that sets the two-key dictionary
         public static void SetGraphics()
         {
