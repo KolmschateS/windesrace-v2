@@ -1,24 +1,25 @@
 using System.IO;
 using NUnit.Framework;
-using windesrace_v2;
+using Model;
 
-namespace VisualisationTest
+namespace ControllerTest
 {
     [TestFixture]
-    public class VisualisationChangeCursosPosTest
+    public class ModelTrackChangeCursosPosTest
     {
+        private Track _track;
         [SetUp]
         public void Setup()
         {
-            Visualisation.Initialize();
+            _track = new Track("TestTrack", 
+                new[] {SectionTypes.Straight}, 
+                0);
         }
 
         [Test]
         public void D0()
         {
-            const int direction = 0;
-            Visualisation.Direction = direction;
-            int[] change = Visualisation.ChangeCursorPos();
+            int[] change = _track.ChangeCursorPos(0);
             int[] expectedResult = {0, -8};
             
             Assert.AreEqual(expectedResult,change);
@@ -27,9 +28,7 @@ namespace VisualisationTest
         [Test]
         public void D1()
         {
-            const int direction = 1;
-            Visualisation.Direction = direction;
-            int[] change = Visualisation.ChangeCursorPos();
+            int[] change = _track.ChangeCursorPos(1);
             int[] expectedResult = {4, -4};
             
             Assert.AreEqual(expectedResult,change);
@@ -38,9 +37,7 @@ namespace VisualisationTest
         [Test]
         public void D2()
         {
-            const int direction = 2;
-            Visualisation.Direction = direction;
-            int[] change = Visualisation.ChangeCursorPos();
+            int[] change = _track.ChangeCursorPos(2);
             int[] expectedResult = {0, 0};
             
             Assert.AreEqual(expectedResult,change);
@@ -49,9 +46,7 @@ namespace VisualisationTest
         [Test]
         public void D3()
         {
-            const int direction = 3;
-            Visualisation.Direction = direction;
-            int[] change = Visualisation.ChangeCursorPos();
+            int[] change = _track.ChangeCursorPos(3);
             int[] expectedResult = {-4, -4};
             
             Assert.AreEqual(expectedResult,change);
@@ -60,9 +55,7 @@ namespace VisualisationTest
         [Test]
         public void D10()
         {
-            const int direction = 10;
-            Visualisation.Direction = direction;
-            int[] change = Visualisation.ChangeCursorPos();
+            int[] change = _track.ChangeCursorPos(10);
             int[] expectedResult = {10, 10};
             
             Assert.AreEqual(expectedResult,change);
