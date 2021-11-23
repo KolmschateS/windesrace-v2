@@ -4,10 +4,14 @@ namespace Model
     public class Section
     {
         public SectionTypes SectionType { get; set; }
+        public int X, Y, Direction;
 
-        public Section(SectionTypes sectionType)
+        public Section(SectionTypes sectionType, int x, int y, int direction)
         {
-            this.SectionType = sectionType;
+            X = x;
+            Y = y;
+            Direction = direction;
+            SectionType = sectionType;
         }
     }
 }
