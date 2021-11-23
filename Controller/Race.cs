@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Channels;
+using System.Timers;
 using Model;
 namespace Controller
 {
     public class Race
     {
+        private readonly Timer _timer;
+        private const int TimerInterval = 500;
         public Track Track { get; set; }
         public List<IParticipant> Pilots { get; set; }
         public DateTime StartTime { get; set; }
-
         private Random Random { get; set; } 
         private Dictionary<Section, SectionData> Positions { get; set; }
 
@@ -24,8 +24,11 @@ namespace Controller
             Track = track;
             Pilots = GenerateQualificationList(pilots);
             SetPositions(track, Pilots);
-        }
 
+            _timer = new Timer(TimerInterval);
+            _timer.Elapsed += OnTimedEvent;
+            Start();
+        }
         // Method to read SectionData
         public SectionData GetSectionData(Section section)
         {
@@ -37,7 +40,6 @@ namespace Controller
             Positions.Add(section, newData);
             return newData;
         }
-
         // Methode to randomize the equipement from opponents
         // For each pilot the equipement will be inserted with a random Integer
         public List<IParticipant> RandomizeEquipement(List<IParticipant> pilots)
@@ -66,7 +68,6 @@ namespace Controller
                 throw;
             }
         }
-
         public void SetPositions(Track track, List<IParticipant> participants)
         {
             List<Section> startgrid = track.GetStartgrid();
@@ -84,5 +85,18 @@ namespace Controller
                 Positions[section] = sectionData;
             }
         }
+
+        #region TimerStuff
+        private void OnTimedEvent(object sender, ElapsedEventArgs eventArgs)
+        {
+            Console.WriteLine($"{eventArgs.SignalTime}");
+        }
+
+        private void Start()
+        {
+            _timer.Start();
+        }
+        #endregion
+        
     }
 }
