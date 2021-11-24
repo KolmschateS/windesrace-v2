@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.Intrinsics.X86;
+using System.Transactions;
 using Controller;
 using Model;
 
@@ -12,60 +14,43 @@ namespace windesrace_v2
 {
     public static class Visualisation
     {
-        // The direction is determined by an integer. The integer goes from 0 to 3: 0, 1, 2, 3
-        // The direction for integer is as following:
-        // 0:   ^
-        //      |
-        //      |
-        //      |
-        // 1: ---->
-        // 2:   |
-        //      |
-        //      |
-        //      ↓
-        // 3: <----
-        // The default value is one, which is set in the Initialize function
-        public static int Direction { get; set; }
-
         // The Two-key dictionary works as following:
         // Dictionary<(int direction, Sectiontypes sectiontype), String[] SectionString>
         public static Dictionary<(int, SectionTypes), string[]> Graphics { get; set; }
-
-        public static void Initialize()
+        private static Race _currentRace;
+        public static void Initialize(Race race)
         {
+            _currentRace = race;
             SetGraphics();
         }
 
-        public static void DrawRace(Race race)
+        public static void OnNextRace(object o, NextRaceArgs e)
         {
-            foreach (Section section in race.Track.Sections)
-            {
-                SectionData sectionData =  race.GetSectionData(section);
-                if (sectionData.Left != null && sectionData.Right != null)
-                {
-                    Console.SetCursorPosition(section.X, section.Y);
-                    DrawSection(section, section.Direction, sectionData.Left, sectionData.Right);
-                }
-            }
+            Initialize(e.Race);
+            
+            _currentRace.DriversChanged += OnDriversChanged;
+            // DrawTrack(_currentRace.Track);
         }
-        // Function to call to draw the track
-        public static void DrawTrack(Track track)
+        public static void OnDriversChanged(object o, DriversChangedEventArgs eventArgs)
         {
-            Console.Clear();
-            foreach (Section section in track.Sections)
-            {
-                Console.SetCursorPosition(section.X, section.Y);
-                DrawSection(section, section.Direction, null, null);
-            }
+            // DrawTrack(_currentRace.Track);
         }
 
+        public static void DrawTrack(Track track)
+        {
+            foreach (Section section in track.Sections)
+            {
+                SectionData sectionData =  _currentRace.GetSectionData(section);
+                Console.SetCursorPosition(section.X, section.Y);
+                DrawSection(section, section.Direction, sectionData.Left, sectionData.Right);
+            }
+        }
         public static void DrawSection(Section section, int direction, IParticipant leftParticipant, IParticipant rightParticipant)
         {
-            string[] DrawString = Graphics[(direction, section.SectionType)];
-            // Console.WriteLine($"X: {section.X} Y: {section.Y} Dir: {section.Direction}");
-            foreach (string line in DrawString)
+            string[] drawString = Graphics[(direction, section.SectionType)];
+            foreach (string line in drawString)
             {
-                Console.Write(SetSectionstring(line, leftParticipant, rightParticipant ));
+                Console.Write(SetSectionstring(line, leftParticipant, rightParticipant));
                 Console.CursorTop += 1;
                 Console.CursorLeft -= 4;
             }

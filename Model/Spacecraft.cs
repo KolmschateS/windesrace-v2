@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Reflection.Metadata.Ecma335;
+
 namespace Model
 {
     public class Spacecraft : IEquipment
@@ -7,6 +9,8 @@ namespace Model
         public int Performance { get; set; }
         public int Speed { get; set; }
         public bool IsBroken { get; set; }
+        private readonly int _minParameterValue = 20;
+        private readonly int _maxParameterValue = 40;
 
         public Spacecraft(int quality, int performance, int speed, bool isbroken)
         {
@@ -25,18 +29,14 @@ namespace Model
 
         private int RandomizeParameter(int param, Random random)
         {
-            int change = random.Next(1, 5);
-            int result = 0;
-            if (random.Next(0, 2) > 0)
-            {
-                result = param + change;
-            }
-            else
-            {
-                result = param - change;
-            }
+            // Change in paramter
+            int change = random.Next(-5, 5);
 
-            return result;
+            // Result of the paramter and the change
+            int result = param + change;
+            
+            // Checks if the change + the paramater is bigger than zero or smaller than the max 
+            return result > 0 && result < _maxParameterValue && result > _minParameterValue ? result : param;
         }
     }
 }

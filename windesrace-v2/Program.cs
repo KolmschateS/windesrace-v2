@@ -9,14 +9,12 @@ namespace windesrace_v2
         static void Main(string[] args)
         {
             Data.Initialize();
-            Visualisation.Initialize();
+            Data.NextRace += Visualisation.OnNextRace;
+            Data.SetNextRace();
+
             for (;;)
             {
-                Data.NextRace();
-                Thread.Sleep(5000);
-
-                // Visualisation.DrawTrack(Data.CurrentRace.Track);
-                // Visualisation.DrawRace(Data.CurrentRace);
+                Thread.Sleep(1000);
             }
         }
     }
