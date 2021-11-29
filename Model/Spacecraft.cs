@@ -9,8 +9,8 @@ namespace Model
         public int Performance { get; set; }
         public int Speed { get; set; }
         public bool IsBroken { get; set; }
-        private readonly int _minParameterValue = 20;
-        private readonly int _maxParameterValue = 40;
+        public readonly int _minParameterValue = 20;
+        public readonly int _maxParameterValue = 40;
 
         public Spacecraft(int quality, int performance, int speed, bool isbroken)
         {

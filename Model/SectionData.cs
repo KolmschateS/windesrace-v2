@@ -7,7 +7,5 @@ namespace Model
         public int DistanceLeft { get; set; }
         public IParticipant Right { get; set; }
         public int DistanceRight { get; set; }
-        
-        
     }
 }

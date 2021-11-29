@@ -1,3 +1,4 @@
+using Controller;
 using NUnit.Framework;
 using windesrace_v2;
 using Model;
@@ -16,7 +17,9 @@ namespace VisualisationTest
         [SetUp]
         public void Setup()
         {
-            Visualisation.Initialize();
+            Data.Initialize();
+            Data.SetNextRace();
+            Visualisation.Initialize(Data.CurrentRace);
         }
 
         // For all tests

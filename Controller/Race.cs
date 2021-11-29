@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Timers;
 using Model;
@@ -15,7 +17,7 @@ namespace Controller
         public List<IParticipant> Pilots { get; set; }
         public DateTime StartTime { get; set; }
         private Random Random { get; set; } 
-        private Dictionary<Section, SectionData> Positions { get; set; }
+        public Dictionary<Section, SectionData> _positions { get; set; }
         private readonly int _frontStartGridDistance = 750;
         private readonly int _backStartGridDistance = 250;
 
@@ -23,7 +25,7 @@ namespace Controller
         public Race(Track track, List<IParticipant> pilots)
         {
             Random = new Random(DateTime.Now.Millisecond);
-            Positions = new Dictionary<Section, SectionData>();
+            _positions = new Dictionary<Section, SectionData>();
             StartTime = DateTime.Now;
             Track = track;
             Pilots = GenerateQualificationList(pilots);
@@ -36,12 +38,12 @@ namespace Controller
         // Method to read SectionData
         public SectionData GetSectionData(Section section)
         {
-            if(Positions.ContainsKey(section))
+            if(_positions.ContainsKey(section))
             {
-                return Positions[section];
+                return _positions[section];
             }
             SectionData newData = new SectionData();
-            Positions.Add(section, newData);
+            _positions.Add(section, newData);
             return newData;
         }
         // Methode to randomize the equipement from opponents
@@ -95,16 +97,19 @@ namespace Controller
                 place += 2;
                 
                 // Sets the section in Positions with the filled sectionData
-                Positions[section] = sectionData;
+                _positions[section] = sectionData;
             }
         }
 
         #region TimerStuff
         private void OnTimedEvent(object sender, ElapsedEventArgs eventArgs)
         {
+            // Randomizes the equipement of the pilots
+            Pilots = RandomizeEquipement(Pilots);
+
             // Moves the participants every timer trigger
             MoveParticipants();
-            Pilots = RandomizeEquipement(Pilots);
+            
             DriversChanged?.Invoke(this, new DriversChangedEventArgs(Track));
         }
 
@@ -115,42 +120,105 @@ namespace Controller
         #endregion
 
         #region ParticipantsMovement
+
         public void MoveParticipants()
         {
-            Console.Clear();
-            foreach (var position in Positions)
-            {
-                SectionData sectionData = position.Value;
-                MoveParticipant(sectionData.Left, sectionData.DistanceLeft);
-                MoveParticipant(sectionData.Right, sectionData.DistanceRight);
-            }
-        }
-        public void MoveParticipant(IParticipant participant, int currentDistance)
-        {
-            int movement = CalculateMovement(participant);
-            int remainder;
-            Console.WriteLine($"Current distance: {currentDistance}");
-            Console.WriteLine($"Current movement: {movement}");
-            // If new distance exceeds max length
-            if (movement + currentDistance > Section.SectionLength)
-            {
-                // The current player has to be moved to the next section
-                // to set the correct distance the remainder has the be calculated
-                remainder = movement + currentDistance - Section.SectionLength;
-                Console.WriteLine($"Current remainder: {remainder}");
-                // Move participant to next section of the track
-                // Edit that sectionData with the new participant and the remaining 
+            LinkedListNode<Section> node = Track.Sections.Last;
 
+            while (node != null)
+            {
+                SectionData currentSectionData = GetSectionData(node.Value);
+                Section targetSection = node.Next != null ? node.Next.Value : Track.Sections.First?.Value;
+                SectionData targetSectionData = GetSectionData(targetSection);
+
+                if (currentSectionData.Left != null)
+                    currentSectionData.DistanceLeft = SetSectionDistance(currentSectionData.Left, currentSectionData.DistanceLeft);
+
+                if (currentSectionData.DistanceLeft >= Section.SectionLength)
+                    MoveParticipant(node.Value, currentSectionData, targetSection, targetSectionData, true);
+
+                if (currentSectionData.Right != null)
+                    currentSectionData.DistanceRight = SetSectionDistance(currentSectionData.Right,
+                        currentSectionData.DistanceRight);
+
+                if (currentSectionData.DistanceRight >= Section.SectionLength)
+                    MoveParticipant(node.Value, currentSectionData, targetSection, targetSectionData, false);
+
+                node = node.Previous;
             }
-            Console.WriteLine();
         }
-        // Calculates the traveled distance of a participant based on its performance and speed
-        public int CalculateMovement(IParticipant participant)
+
+        private int CalculateMovement(IParticipant participant)
         {
             return participant.Equipment.Performance * participant.Equipment.Speed;
         }
+        private int SetSectionDistance(IParticipant currentParticipant, int currentDistance)
+        {
+            return currentDistance + CalculateMovement(currentParticipant);
+        }
+
+        public void MoveParticipant(Section currentSection, SectionData currentSectionData, Section targetSection,
+            SectionData targetSectionData, bool IsLeft)
+        {
+            bool moved = false;
+            // Check if the target left place is empty
+            if (targetSectionData.Left == null)
+            {
+                // The next left space is available. Place the participant there and empty the current place
+                if (IsLeft)
+                {
+                    _positions[targetSection].DistanceLeft = currentSectionData.DistanceLeft - Section.SectionLength;
+                    _positions[targetSection].Left = currentSectionData.Left;
+                    _positions[currentSection].DistanceLeft = 0;
+                    _positions[currentSection].Left = null;
+                    moved = true;
+                }
+                else
+                {
+                    _positions[targetSection].DistanceLeft = currentSectionData.DistanceRight - Section.SectionLength;
+                    _positions[targetSection].Left = currentSectionData.Right;
+                    _positions[currentSection].DistanceRight= 0;
+                    _positions[currentSection].Right = null;
+                    moved = true;
+                }
+            }
+            
+            // Check if the target right place is empty
+            else if (targetSectionData.Right == null)
+            {
+                // The next right space is available. Place the participant there and empty the current place.
+                if (IsLeft)
+                {
+                    _positions[targetSection].DistanceRight = currentSectionData.DistanceLeft - Section.SectionLength;
+                    _positions[targetSection].Right = currentSectionData.Left;
+                    _positions[currentSection].DistanceLeft = 0;
+                    _positions[currentSection].Left = null;
+                    moved = true;
+                }
+                else
+                {
+                    _positions[targetSection].DistanceRight = currentSectionData.DistanceRight - Section.SectionLength;
+                    _positions[targetSection].Right = currentSectionData.Right;
+                    _positions[currentSection].DistanceRight= 0;
+                    _positions[currentSection].Right = null;
+                    moved = true;
+                }
+            }
+
+            if (!moved)
+            {
+                if (IsLeft)
+                {
+                    _positions[currentSection].DistanceLeft = Section.SectionLength - 1;
+                }
+                else
+                {
+                    _positions[currentSection].DistanceRight = Section.SectionLength - 1;
+                }
+            }
+
+
+        }
         #endregion
-        
-        
     }
 }

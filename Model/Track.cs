@@ -25,7 +25,7 @@ namespace Model
         // into the Linkedlist with sections
         public LinkedList<Section> SetSections(SectionTypes[] sections, int startDirection)
         {
-            LinkedList<Section> sectionsList = SetSectionData(sections, startDirection);
+            LinkedList<Section> sectionsList = SetSectionCoordinates(sections, startDirection);
 
             int[] startPositionXy = CaluclateMinimalXandY(sectionsList);
             sectionsList = RecalculateCoordinatesInSections(sectionsList, startPositionXy);
@@ -44,7 +44,7 @@ namespace Model
             return xy;
         }
 
-        public LinkedList<Section> SetSectionData(SectionTypes[] sections, int startDirection)
+        public LinkedList<Section> SetSectionCoordinates(SectionTypes[] sections, int startDirection)
         {
             int[] currentPos = {0, 0};
             int direction = startDirection;
@@ -192,6 +192,19 @@ namespace Model
                 default:
                     return new int[]{10, 10};
             }
+        }
+
+        public Section GetNextSection(Section currentSection, int stepsToTake)
+        {
+            LinkedListNode<Section> node = Sections.Find(currentSection);
+            for (int i = 0; i < stepsToTake; i++)
+            {
+                if (node == null) { throw new Exception("Node in GetFinishNodeFromSections is null"); }
+                node = node.Next;
+            }
+            if (node == null) { throw new Exception("Node in GetFinishNodeFromSections is null"); }
+            
+            return node.Value;
         }
     }
 }

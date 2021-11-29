@@ -27,21 +27,20 @@ namespace windesrace_v2
         public static void OnNextRace(object o, NextRaceArgs e)
         {
             Initialize(e.Race);
-            
             _currentRace.DriversChanged += OnDriversChanged;
-            // DrawTrack(_currentRace.Track);
         }
         public static void OnDriversChanged(object o, DriversChangedEventArgs eventArgs)
         {
-            // DrawTrack(_currentRace.Track);
+            DrawTrack(eventArgs.Track);
         }
 
         public static void DrawTrack(Track track)
         {
+            Console.Clear();
             foreach (Section section in track.Sections)
             {
                 SectionData sectionData =  _currentRace.GetSectionData(section);
-                Console.SetCursorPosition(section.X, section.Y);
+                Console.SetCursorPosition(section.X, section.Y + _currentRace.Pilots.Count + 2);
                 DrawSection(section, section.Direction, sectionData.Left, sectionData.Right);
             }
         }
@@ -56,6 +55,7 @@ namespace windesrace_v2
             }
             Console.CursorTop -= 4;
         }
+
         public static string SetSectionstring(string sectionString, IParticipant left, IParticipant right)
         {
             // If the particpants != null and the string contains L, replace the L with the leftParticipant Initial

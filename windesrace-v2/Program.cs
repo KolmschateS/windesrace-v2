@@ -14,7 +14,7 @@ namespace windesrace_v2
 
             for (;;)
             {
-                Thread.Sleep(1000);
+                Thread.Sleep(10000);
             }
         }
     }

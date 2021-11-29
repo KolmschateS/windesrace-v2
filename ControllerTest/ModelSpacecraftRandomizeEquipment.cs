@@ -14,28 +14,28 @@ namespace ControllerTest
         [SetUp]
         public void SetUp()
         {
-            _spacecraft = new Spacecraft(50, 50, 50, false);
+            _spacecraft = new Spacecraft(Data._baseQuality, Data._basePerformance, Data._baseSpeed, false);
         }
         
         [Test]
         public void SpacecraftRandomizeSpeedAreNotEqual()
         {
             _spacecraft.RandomizeEquipment(new Random(DateTime.Now.Millisecond));
-            Assert.AreNotEqual(50, _spacecraft.Speed);
+            Assert.AreNotEqual(Data._baseSpeed, _spacecraft.Speed);
         }
         
         [Test]
         public void SpacecraftRandomizePerformanceAreNotEqual()
         {
             _spacecraft.RandomizeEquipment(new Random(DateTime.Now.Millisecond));
-            Assert.AreNotEqual(50, _spacecraft.Performance);
+            Assert.AreNotEqual(Data._basePerformance, _spacecraft.Performance);
         }
         
         [Test]
         public void SpacecraftRandomizeQualityAreNotEqual()
         {
             _spacecraft.RandomizeEquipment(new Random(DateTime.Now.Millisecond));
-            Assert.AreNotEqual(50, _spacecraft.Quality);
+            Assert.AreNotEqual(Data._baseQuality, _spacecraft.Quality);
         }
     }
 }
