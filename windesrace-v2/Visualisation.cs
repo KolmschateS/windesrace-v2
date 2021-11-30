@@ -31,12 +31,24 @@ namespace windesrace_v2
         }
         public static void OnDriversChanged(object o, DriversChangedEventArgs eventArgs)
         {
+            DrawLiveLaps();
             DrawTrack(eventArgs.Track);
+        }
+
+        public static void DrawLiveLaps()
+        {
+            Console.SetCursorPosition(0, 0);
+            Console.WriteLine(_currentRace.IsFinishFlagOut);
+            Console.WriteLine($"{_currentRace.AreAllFinished} {_currentRace.ParticipantFinished.Count}");
+
+            foreach (var VARIABLE in _currentRace.ParticipantLaps)
+            {
+                Console.WriteLine($"{VARIABLE.Key.Name} {VARIABLE.Value} ");
+            }
         }
 
         public static void DrawTrack(Track track)
         {
-            Console.Clear();
             foreach (Section section in track.Sections)
             {
                 SectionData sectionData =  _currentRace.GetSectionData(section);

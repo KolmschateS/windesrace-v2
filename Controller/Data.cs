@@ -44,6 +44,8 @@ namespace Controller
         // TODO stop from crashing when the Competition.track Queue is empty
         public static void SetNextRace()
         {
+            // Clean up previous race
+            CurrentRace?.CleanUp();
             CurrentRace = new Race(Competition.NextTrack(), Competition.Participants);
             NextRace?.Invoke(null, new NextRaceArgs(CurrentRace));
         }

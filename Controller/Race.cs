@@ -1,51 +1,64 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Timers;
 using Model;
+
 namespace Controller
 {
     public class Race
     {
         private readonly Timer _timer;
-        private const int TimerInterval = 500;
+        private const int TimerInterval = 750;
 
         public event EventHandler<DriversChangedEventArgs> DriversChanged;
         public Track Track { get; set; }
         public List<IParticipant> Pilots { get; set; }
         public DateTime StartTime { get; set; }
-        private Random Random { get; set; } 
-        public Dictionary<Section, SectionData> _positions { get; set; }
+        private Random Random { get; set; }
+        public Dictionary<IParticipant, int> ParticipantLaps { get; set; }
+        public Dictionary<IParticipant, bool> ParticipantFinished { get; set; }
+        public Dictionary<Section, SectionData> Positions { get; set; }
         private readonly int _frontStartGridDistance = 750;
         private readonly int _backStartGridDistance = 250;
+        private readonly int _maxLaps = 1;
+        public bool IsFinishFlagOut { get; set; }
+        public bool AreAllFinished { get; set; }
 
         // Constructor
         public Race(Track track, List<IParticipant> pilots)
         {
             Random = new Random(DateTime.Now.Millisecond);
-            _positions = new Dictionary<Section, SectionData>();
+            Positions = new Dictionary<Section, SectionData>();
             StartTime = DateTime.Now;
             Track = track;
             Pilots = GenerateQualificationList(pilots);
             SetPositionsWithStartGrid(track, Pilots);
+            ParticipantLaps = SetParticipantLaps(Pilots);
+            ParticipantFinished = new Dictionary<IParticipant, bool>();
+
+            IsFinishFlagOut = false;
+            AreAllFinished = false;
 
             _timer = new Timer(TimerInterval);
             _timer.Elapsed += OnTimedEvent;
             Start();
         }
+
         // Method to read SectionData
         public SectionData GetSectionData(Section section)
         {
-            if(_positions.ContainsKey(section))
+            if (Positions.ContainsKey(section))
             {
-                return _positions[section];
+                return Positions[section];
             }
+
             SectionData newData = new SectionData();
-            _positions.Add(section, newData);
+            Positions.Add(section, newData);
             return newData;
         }
+
         // Methode to randomize the equipement from opponents
         // For each pilot the equipement will be inserted with a random Integer
         public List<IParticipant> RandomizeEquipement(List<IParticipant> pilots)
@@ -58,50 +71,66 @@ namespace Controller
                     pilot.Equipment.RandomizeEquipment(Random);
                     result.Add(pilot);
                 }
+
                 return result;
             }
         }
+
+        #region Setup
+
         public List<IParticipant> GenerateQualificationList(List<IParticipant> pilots)
         {
             List<IParticipant> randomPilots = RandomizeEquipement(pilots);
             try
-            { 
+            {
                 return randomPilots.OrderByDescending(pilot => pilot.Equipment.Speed).Take(Track.GridSize).ToList();
             }
             catch (Exception e)
-            { 
-                Console.WriteLine("Whoops");
+            {
+                Console.WriteLine($"{e}");
                 throw;
             }
         }
+
+        private Dictionary<IParticipant, int> SetParticipantLaps(List<IParticipant> participants)
+        {
+            Dictionary<IParticipant, int> result = new Dictionary<IParticipant, int>();
+            foreach (IParticipant aParticipant in participants)
+                result[aParticipant] = 0;
+            return result;
+        }
+
         public void SetPositionsWithStartGrid(Track track, List<IParticipant> participants)
         {
             List<Section> startgrid = track.GetStartgrid();
             int place = 0;
-            
-            
+
+
             foreach (Section section in startgrid)
             {
                 SectionData sectionData = GetSectionData(section);
                 // Checks if the to allocate place is also in the participants list 
-                if (place > participants.Count - 1) break; 
+                if (place > participants.Count - 1) break;
                 sectionData.Left = participants[place]; // If so set the sectiondata with the correct participant
                 sectionData.DistanceLeft = _frontStartGridDistance;
-                
+
                 // Checks if the to allocate place is also in the participants list 
                 if (place + 1 > participants.Count - 1) break;
                 sectionData.Right = participants[place + 1]; // If so set the sectiondata with the correct participant
                 sectionData.DistanceRight = _backStartGridDistance;
-                
+
                 // Ups the place with 2 to continue to the next startgrid slots
                 place += 2;
-                
+
                 // Sets the section in Positions with the filled sectionData
-                _positions[section] = sectionData;
+                Positions[section] = sectionData;
             }
         }
 
+        #endregion
+
         #region TimerStuff
+
         private void OnTimedEvent(object sender, ElapsedEventArgs eventArgs)
         {
             // Randomizes the equipement of the pilots
@@ -109,7 +138,16 @@ namespace Controller
 
             // Moves the participants every timer trigger
             MoveParticipants();
-            
+
+            // Checks if all the participants are finished
+            AreAllParticipantsFinished();
+
+            // If all participants are finished the race needs to be cleared and the next Race must be initialized
+            if (AreAllFinished)
+            {
+                Data.SetNextRace();
+            }
+
             DriversChanged?.Invoke(this, new DriversChangedEventArgs(Track));
         }
 
@@ -117,6 +155,14 @@ namespace Controller
         {
             _timer.Start();
         }
+
+        public void CleanUp()
+        {
+            DriversChanged = null;
+            _timer.Stop();
+            Console.Clear();
+        }
+
         #endregion
 
         #region ParticipantsMovement
@@ -132,7 +178,8 @@ namespace Controller
                 SectionData targetSectionData = GetSectionData(targetSection);
 
                 if (currentSectionData.Left != null)
-                    currentSectionData.DistanceLeft = SetSectionDistance(currentSectionData.Left, currentSectionData.DistanceLeft);
+                    currentSectionData.DistanceLeft =
+                        SetSectionDistance(currentSectionData.Left, currentSectionData.DistanceLeft);
 
                 if (currentSectionData.DistanceLeft >= Section.SectionLength)
                     MoveParticipant(node.Value, currentSectionData, targetSection, targetSectionData, true);
@@ -152,73 +199,179 @@ namespace Controller
         {
             return participant.Equipment.Performance * participant.Equipment.Speed;
         }
+
         private int SetSectionDistance(IParticipant currentParticipant, int currentDistance)
         {
             return currentDistance + CalculateMovement(currentParticipant);
         }
 
         public void MoveParticipant(Section currentSection, SectionData currentSectionData, Section targetSection,
-            SectionData targetSectionData, bool IsLeft)
+            SectionData targetSectionData, bool isLeft)
         {
-            bool moved = false;
-            // Check if the target left place is empty
-            if (targetSectionData.Left == null)
-            {
-                // The next left space is available. Place the participant there and empty the current place
-                if (IsLeft)
-                {
-                    _positions[targetSection].DistanceLeft = currentSectionData.DistanceLeft - Section.SectionLength;
-                    _positions[targetSection].Left = currentSectionData.Left;
-                    _positions[currentSection].DistanceLeft = 0;
-                    _positions[currentSection].Left = null;
-                    moved = true;
-                }
-                else
-                {
-                    _positions[targetSection].DistanceLeft = currentSectionData.DistanceRight - Section.SectionLength;
-                    _positions[targetSection].Left = currentSectionData.Right;
-                    _positions[currentSection].DistanceRight= 0;
-                    _positions[currentSection].Right = null;
-                    moved = true;
-                }
-            }
-            
-            // Check if the target right place is empty
-            else if (targetSectionData.Right == null)
-            {
-                // The next right space is available. Place the participant there and empty the current place.
-                if (IsLeft)
-                {
-                    _positions[targetSection].DistanceRight = currentSectionData.DistanceLeft - Section.SectionLength;
-                    _positions[targetSection].Right = currentSectionData.Left;
-                    _positions[currentSection].DistanceLeft = 0;
-                    _positions[currentSection].Left = null;
-                    moved = true;
-                }
-                else
-                {
-                    _positions[targetSection].DistanceRight = currentSectionData.DistanceRight - Section.SectionLength;
-                    _positions[targetSection].Right = currentSectionData.Right;
-                    _positions[currentSection].DistanceRight= 0;
-                    _positions[currentSection].Right = null;
-                    moved = true;
-                }
-            }
+            bool targetIsLeft = GetEmptyTargetMostToTheFront(targetSectionData);
 
-            if (!moved)
+            // Checks if the participant can be moved to a new section based on the targetSectionData of the next section
+            if (CanBeMoved(targetSectionData))
             {
-                if (IsLeft)
+                // Checks if the participant is passing the finish line, based on the current sectiontype and next sectiontype
+                if (PassingFinish(currentSection.SectionType, targetSection.SectionType))
                 {
-                    _positions[currentSection].DistanceLeft = Section.SectionLength - 1;
+                    // Adds a lap to the current participant
+                    AddLap(currentSectionData, isLeft);
+                    // Checks if the participant is finished
+                    if (IsFinished(currentSectionData, isLeft))
+                    {
+                        // Clears the participant out of the race
+                        FinishParticipant(currentSectionData, currentSection, isLeft);
+                        return;
+                    }
                 }
-                else
-                {
-                    _positions[currentSection].DistanceRight = Section.SectionLength - 1;
-                }
+                // The participant has to be moved, the participant is to be cleared of the current sectiondata and
+                // and added to the next sections sectionsdata
+                SetCurrentAndTargetPositions(currentSection, targetSection, currentSectionData, isLeft, targetIsLeft);
             }
-
-
+            // Participant should have moved, but could not because the next sectiondata was full. So the distance will
+            // be set to the maximum value possible: sectionlength - 1
+            else
+            {
+                SetMaxDistance(currentSection, isLeft);
+            }
         }
+
+        public void SetCurrentAndTargetPositions(Section currentSection, Section targetSection,
+            SectionData currentSectionData, bool currentIsLeft,
+            bool targetIsLeft)
+        {
+            IParticipant participant = currentIsLeft ? currentSectionData.Left : currentSectionData.Right;
+            int currentDistance = currentIsLeft ? currentSectionData.DistanceLeft : currentSectionData.DistanceRight;
+
+            if (targetIsLeft)
+            {
+                Positions[targetSection].DistanceLeft = currentDistance - Section.SectionLength;
+                Positions[targetSection].Left = participant;
+            }
+            else
+            {
+                Positions[targetSection].DistanceRight = currentDistance - Section.SectionLength;
+                Positions[targetSection].Right = participant;
+            }
+
+            if (currentIsLeft)
+            {
+                Positions[currentSection].DistanceLeft = 0;
+                Positions[currentSection].Left = null;
+            }
+            else
+            {
+                Positions[currentSection].DistanceRight = 0;
+                Positions[currentSection].Right = null;
+            }
+        }
+
+        public void SetMaxDistance(Section section, bool isLeft)
+        {
+            if (isLeft)
+                Positions[section].DistanceLeft = Section.SectionLength - 1;
+            else
+                Positions[section].DistanceRight = Section.SectionLength - 1;
+        }
+
+        public bool GetEmptyTargetMostToTheFront(SectionData sectionData)
+        {
+            return sectionData.Left == null;
+        }
+
+        public bool CanBeMoved(SectionData targetSectionData)
+        {
+            return targetSectionData.Left == null || targetSectionData.Right == null;
+        }
+
+        #endregion
+
+
+        #region FinishStuff
+
+        public bool PassingFinish(SectionTypes currentSectionType, SectionTypes targetSectionType)
+        {
+            if (currentSectionType == SectionTypes.Finish && targetSectionType != SectionTypes.Finish)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public void FinishParticipant(SectionData sectionData, Section section, bool isLeft)
+        {
+            if (isLeft)
+            {
+                ParticipantFinished[sectionData.Left] = true;
+                Positions[section].Left = null;
+                Positions[section].DistanceLeft = 0;
+            }
+            else
+            {
+                ParticipantFinished[sectionData.Right] = true;
+                Positions[section].Right = null;
+                Positions[section].DistanceRight = 0;
+            }
+        }
+
+        public void AddLap(SectionData sectionData, bool isLeft)
+        {
+            if (isLeft)
+            {
+                ParticipantLaps[sectionData.Left]++;
+            }
+            else
+            {
+                ParticipantLaps[sectionData.Right]++;
+            }
+        }
+
+        public bool IsFinished(SectionData sectionData, bool isLeft)
+        {
+            // Checks if the finish flag is currently out
+            if (!IsFinishFlagOut)
+            {
+                // Left participant is inserted
+                if (isLeft)
+                {
+                    // The finish flag is not out, but a participant has reached the max laps.
+                    if (ParticipantLaps[sectionData.Left] == _maxLaps + 1)
+                    {
+                        // Put the finishflag out and return true as the participant is finished and return true
+                        IsFinishFlagOut = true;
+                        return true;
+                    }
+                }
+                // Right participant is inserted
+                else
+                {
+                    // The finish flag is not out, but a participant has reached the max laps.
+                    if (ParticipantLaps[sectionData.Right] == _maxLaps + 1)
+                    {
+                        // Put the finishflag out and return true as the participant is finished and return true
+                        IsFinishFlagOut = true;
+                        return true;
+                    }
+                }
+            }
+            // The finish flag is out, so the inserted sectionData has to be finished
+            else
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public void AreAllParticipantsFinished()
+        {
+            if (ParticipantFinished.Count == Pilots.Count)
+            {
+                AreAllFinished = true;
+            }
+        }
+
         #endregion
     }
 }
