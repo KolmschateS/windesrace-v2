@@ -1,12 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Runtime.Intrinsics.X86;
-using System.Transactions;
 using Controller;
 using Model;
 
@@ -39,11 +32,15 @@ namespace windesrace_v2
         {
             Console.SetCursorPosition(0, 0);
             Console.WriteLine(_currentRace.IsFinishFlagOut);
-            Console.WriteLine($"{_currentRace.AreAllFinished} {_currentRace.ParticipantFinished.Count}");
+            Console.WriteLine($"{_currentRace.AreAllFinished} {_currentRace.ParticipantFinished.Count} ");
 
             foreach (var VARIABLE in _currentRace.ParticipantLaps)
             {
                 Console.WriteLine($"{VARIABLE.Key.Name} {VARIABLE.Value} ");
+                Console.Write($"{VARIABLE.Key.Equipment.IsBroken} | ");
+                Console.Write($"S: {VARIABLE.Key.Equipment.Strength} | ");
+                Console.Write($"F: {VARIABLE.Key.Equipment.Fix} | ");
+                Console.Write($"Q: {VARIABLE.Key.Equipment.Quality} | ");
             }
         }
 
@@ -68,8 +65,17 @@ namespace windesrace_v2
             Console.CursorTop -= 4;
         }
 
+        // TODO fix with the IsBroken
         public static string SetSectionstring(string sectionString, IParticipant left, IParticipant right)
         {
+            if (left != null && left.Equipment.IsBroken && sectionString.Contains("L"))
+            {
+                return sectionString.Replace("L", "%");
+            }
+            if (right != null && right.Equipment.IsBroken && sectionString.Contains("L"))
+            {
+                return sectionString.Replace("R", "%");
+            }
             // If the particpants != null and the string contains L, replace the L with the leftParticipant Initial
             if (left != null && sectionString.Contains("L")) return sectionString.Replace("L", left.Initial);
             
@@ -80,7 +86,7 @@ namespace windesrace_v2
         }
 
         // SetGraphics is the function that sets the two-key dictionary
-        public static void SetGraphics()
+        private static void SetGraphics()
         {
             Graphics = new Dictionary<(int, SectionTypes), string[]>();
             

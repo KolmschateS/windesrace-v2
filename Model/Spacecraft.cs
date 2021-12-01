@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Reflection.Metadata.Ecma335;
+using System.Transactions;
 
 namespace Model
 {
@@ -9,15 +9,19 @@ namespace Model
         public int Performance { get; set; }
         public int Speed { get; set; }
         public bool IsBroken { get; set; }
-        public readonly int _minParameterValue = 20;
-        public readonly int _maxParameterValue = 40;
+        public int Strength { get; set; }
+        public int Fix { get; set; }
+        private readonly int _minParameterValue = 20;
+        private readonly int _maxParameterValue = 40;
 
-        public Spacecraft(int quality, int performance, int speed, bool isbroken)
+        public Spacecraft(int quality, int performance, int speed, bool isBroken)
         {
             Quality = quality;
             Performance = performance;
             Speed = speed;
-            IsBroken = isbroken;
+            IsBroken = isBroken;
+            Strength = 100;
+            Fix = 0;
         }
 
         public void RandomizeEquipment(Random random)
@@ -25,18 +29,50 @@ namespace Model
             Quality = RandomizeParameter(Quality, random);
             Performance = RandomizeParameter(Performance, random);
             Speed = RandomizeParameter(Speed, random);
+            
+            Strength = DetermineStrength();
+            IsBroken = DetermineIsBroken(Strength, random);
         }
 
         private int RandomizeParameter(int param, Random random)
         {
-            // Change in paramter
+            // Change in parameter
             int change = random.Next(-5, 5);
 
-            // Result of the paramter and the change
+            // Result of the parameter and the change
             int result = param + change;
             
-            // Checks if the change + the paramater is bigger than zero or smaller than the max 
+            // Checks if the change + the parameter is bigger than zero or smaller than the max 
             return result > 0 && result < _maxParameterValue && result > _minParameterValue ? result : param;
+        }
+        private bool DetermineIsBroken(int strength, Random random)
+        {
+            // If the spacecraft is not broken, determine it with random and the current strength of the spacecraft
+            if (!IsBroken) { return random.Next(0, strength) == 0; }
+            
+            // The spacecraft is broken, determine if the current Fix is high enough to repair it
+            if (DetermineFix(Fix, Quality) > 100)
+            {
+                // The fix is high enough to repair the spacecraft
+                // rest the strength to 100 and return false to confirm it is not broken anymore
+                Strength = 100;
+                Fix = 0;
+                return false; 
+            }
+            else
+            {
+                Fix = DetermineFix(Fix, Quality);
+            }
+            return true;
+        }
+        private int DetermineStrength()
+        {
+            return IsBroken ? 0 : Strength - Quality / 10;
+        }
+
+        private int DetermineFix(int fix, int quality)
+        {
+            return fix + quality / 5;
         }
     }
 }

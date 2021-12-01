@@ -21,7 +21,6 @@ namespace Controller
 
         public static void AddParticipantsToCompetition(int max)
         {
-            
             // Adds as much participants given with the method
             for (int i = 0; i < max; i++)
             {
@@ -46,7 +45,7 @@ namespace Controller
         {
             // Clean up previous race
             CurrentRace?.CleanUp();
-            CurrentRace = new Race(Competition.NextTrack(), Competition.Participants);
+            CurrentRace = new Race(Competition.NextTrack(), ResetWearOfParticipants(Competition.Participants));
             NextRace?.Invoke(null, new NextRaceArgs(CurrentRace));
         }
         
@@ -64,6 +63,19 @@ namespace Controller
             }
 
             return new string(buffer);
+        }
+
+        public static List<IParticipant> ResetWearOfParticipants(List<IParticipant> participants)
+        {
+            List<IParticipant> result = new List<IParticipant>();
+            foreach (var participant in participants)
+            {
+                participant.Equipment.Strength = 100;
+                participant.Equipment.Fix = 0;
+                result.Add(participant);
+            }
+
+            return result;
         }
     }
 }

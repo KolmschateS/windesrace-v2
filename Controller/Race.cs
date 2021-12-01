@@ -10,7 +10,7 @@ namespace Controller
     public class Race
     {
         private readonly Timer _timer;
-        private const int TimerInterval = 750;
+        private const int TimerInterval = 1000;
 
         public event EventHandler<DriversChangedEventArgs> DriversChanged;
         public Track Track { get; set; }
@@ -35,6 +35,7 @@ namespace Controller
             Track = track;
             Pilots = GenerateQualificationList(pilots);
             SetPositionsWithStartGrid(track, Pilots);
+            
             ParticipantLaps = SetParticipantLaps(Pilots);
             ParticipantFinished = new Dictionary<IParticipant, bool>();
 
@@ -68,10 +69,16 @@ namespace Controller
                 List<IParticipant> result = new List<IParticipant>();
                 foreach (IParticipant pilot in pilots)
                 {
-                    pilot.Equipment.RandomizeEquipment(Random);
-                    result.Add(pilot);
+                    if (IsParticipantFinished(pilot))
+                    {
+                        result.Add(pilot);
+                    }
+                    else
+                    {
+                        pilot.Equipment.RandomizeEquipment(Random);
+                        result.Add(pilot);
+                    }
                 }
-
                 return result;
             }
         }
@@ -80,6 +87,7 @@ namespace Controller
 
         public List<IParticipant> GenerateQualificationList(List<IParticipant> pilots)
         {
+            
             List<IParticipant> randomPilots = RandomizeEquipement(pilots);
             try
             {
@@ -177,14 +185,14 @@ namespace Controller
                 Section targetSection = node.Next != null ? node.Next.Value : Track.Sections.First?.Value;
                 SectionData targetSectionData = GetSectionData(targetSection);
 
-                if (currentSectionData.Left != null)
+                if (currentSectionData.Left != null && !currentSectionData.Left.Equipment.IsBroken)
                     currentSectionData.DistanceLeft =
                         SetSectionDistance(currentSectionData.Left, currentSectionData.DistanceLeft);
 
                 if (currentSectionData.DistanceLeft >= Section.SectionLength)
                     MoveParticipant(node.Value, currentSectionData, targetSection, targetSectionData, true);
 
-                if (currentSectionData.Right != null)
+                if (currentSectionData.Right != null && !currentSectionData.Right.Equipment.IsBroken)
                     currentSectionData.DistanceRight = SetSectionDistance(currentSectionData.Right,
                         currentSectionData.DistanceRight);
 
@@ -362,6 +370,19 @@ namespace Controller
                 return true;
             }
             return false;
+        }
+
+        public bool IsParticipantFinished(IParticipant participant)
+        {
+            try
+            {
+                var test = ParticipantFinished[participant];
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
         }
 
         public void AreAllParticipantsFinished()
