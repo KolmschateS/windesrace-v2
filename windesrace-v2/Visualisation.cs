@@ -24,7 +24,7 @@ namespace windesrace_v2
         }
         public static void OnDriversChanged(object o, DriversChangedEventArgs eventArgs)
         {
-            // DrawLiveLaps();
+            DrawLiveLaps();
             DrawTrack(eventArgs.Track);
         }
 

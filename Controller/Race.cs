@@ -33,11 +33,11 @@ namespace Controller
             Positions = new Dictionary<Section, SectionData>();
             StartTime = DateTime.Now;
             Track = track;
+            ParticipantFinished = new Dictionary<IParticipant, bool>();
             Pilots = GenerateQualificationList(pilots);
             SetPositionsWithStartGrid(track, Pilots);
             
             ParticipantLaps = SetParticipantLaps(Pilots);
-            ParticipantFinished = new Dictionary<IParticipant, bool>();
 
             IsFinishFlagOut = false;
             AreAllFinished = false;
@@ -69,9 +69,17 @@ namespace Controller
                 List<IParticipant> result = new List<IParticipant>();
                 foreach (IParticipant pilot in pilots)
                 {
-                    if (IsParticipantFinished(pilot))
+                    if (ParticipantFinished.ContainsKey(pilot))
                     {
-                        result.Add(pilot);
+                        if (IsParticipantFinished(pilot))
+                        {
+                            result.Add(pilot);
+                        }
+                        else
+                        {
+                            pilot.Equipment.RandomizeEquipment(Random);
+                            result.Add(pilot);
+                        }
                     }
                     else
                     {
@@ -371,18 +379,10 @@ namespace Controller
             }
             return false;
         }
-
+        // TODO fix throw in ParticipantFinished[participant]
         public bool IsParticipantFinished(IParticipant participant)
         {
-            try
-            {
-                var test = ParticipantFinished[participant];
-                return true;
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
+            return ParticipantFinished[participant];
         }
 
         public void AreAllParticipantsFinished()
