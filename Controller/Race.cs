@@ -10,7 +10,7 @@ namespace Controller
     public class Race
     {
         private readonly Timer _timer;
-        private const int TimerInterval = 1000;
+        private const int TimerInterval = 200;
 
         public event EventHandler<DriversChangedEventArgs> DriversChanged;
         public Track Track { get; set; }
@@ -22,7 +22,7 @@ namespace Controller
         public Dictionary<Section, SectionData> Positions { get; set; }
         private readonly int _frontStartGridDistance = 750;
         private readonly int _backStartGridDistance = 250;
-        private readonly int _maxLaps = 1;
+        private readonly int _maxLaps = 3;
         public bool IsFinishFlagOut { get; set; }
         public bool AreAllFinished { get; set; }
 

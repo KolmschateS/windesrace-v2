@@ -62,6 +62,7 @@ namespace Model
             else
             {
                 Fix = DetermineFix(Fix, Quality);
+                Strength = Fix;
             }
             return true;
         }

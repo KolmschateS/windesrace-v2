@@ -24,7 +24,7 @@ namespace windesrace_v2
         }
         public static void OnDriversChanged(object o, DriversChangedEventArgs eventArgs)
         {
-            DrawLiveLaps();
+            // DrawLiveLaps();
             DrawTrack(eventArgs.Track);
         }
 
@@ -49,10 +49,11 @@ namespace windesrace_v2
             foreach (Section section in track.Sections)
             {
                 SectionData sectionData =  _currentRace.GetSectionData(section);
-                Console.SetCursorPosition(section.X, section.Y + _currentRace.Pilots.Count + 2);
+                Console.SetCursorPosition(section.X, section.Y + _currentRace.Pilots.Count + 4);
                 DrawSection(section, section.Direction, sectionData.Left, sectionData.Right);
             }
         }
+        // TODO issue with a -4 being drawn
         public static void DrawSection(Section section, int direction, IParticipant leftParticipant, IParticipant rightParticipant)
         {
             string[] drawString = Graphics[(direction, section.SectionType)];
@@ -65,14 +66,13 @@ namespace windesrace_v2
             Console.CursorTop -= 4;
         }
 
-        // TODO fix with the IsBroken
         public static string SetSectionstring(string sectionString, IParticipant left, IParticipant right)
         {
             if (left != null && left.Equipment.IsBroken && sectionString.Contains("L"))
             {
                 return sectionString.Replace("L", "%");
             }
-            if (right != null && right.Equipment.IsBroken && sectionString.Contains("L"))
+            if (right != null && right.Equipment.IsBroken && sectionString.Contains("R"))
             {
                 return sectionString.Replace("R", "%");
             }
