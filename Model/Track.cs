@@ -13,6 +13,7 @@ namespace Model
         public int StartDirection { get; set; }
         public int GridSize { get; set; }
         private readonly int SectionSize = 4;
+        public (int x, int y) Dimensions { get; set; }
 
         public Track(string name, SectionTypes[] sections, int startDirection)
         {

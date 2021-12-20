@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Graphics\BlueSC.png" />
+    <None Remove="Graphics\GreenSC.png" />
+    <None Remove="Graphics\GreySC.png" />
+    <None Remove="Graphics\RedSC.png" />
+    <None Remove="Graphics\Section\Corner.png" />
+    <None Remove="Graphics\Section\Finish.png" />
+    <None Remove="Graphics\Section\Start.png" />
+    <None Remove="Graphics\Section\Straight.png" />
+    <None Remove="Graphics\YellowSC.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Graphics\Section\Corner.png" />
+    <Content Include="Graphics\Section\Finish.png" />
+    <Content Include="Graphics\Section\Start.png" />
+    <Content Include="Graphics\Section\Straight.png" />
+    <Content Include="Graphics\Spacecraft\BlueSC.png" />
+    <Content Include="Graphics\Spacecraft\GreenSC.png" />
+    <Content Include="Graphics\Spacecraft\GreySC.png" />
+    <Content Include="Graphics\Spacecraft\RedSC.png" />
+    <Content Include="Graphics\Spacecraft\YellowSC.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Controller\Controller.csproj" />
+    <ProjectReference Include="..\Model\Model.csproj" />
+  </ItemGroup>
+
+</Project>

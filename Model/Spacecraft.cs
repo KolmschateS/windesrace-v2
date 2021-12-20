@@ -11,8 +11,8 @@ namespace Model
         public bool IsBroken { get; set; }
         public int Strength { get; set; }
         public int Fix { get; set; }
-        private readonly int _minParameterValue = 20;
-        private readonly int _maxParameterValue = 40;
+        private readonly int _minParameterValue = 10;
+        private readonly int _maxParameterValue = 20;
 
         public Spacecraft(int quality, int performance, int speed, bool isBroken)
         {
@@ -68,7 +68,15 @@ namespace Model
         }
         private int DetermineStrength()
         {
-            return IsBroken ? 0 : Strength - Quality / 10;
+            if (IsBroken)
+            {
+                return 0;
+            }
+            if (Strength - Quality / 10 > 0)
+            {
+                return Strength - Quality / 10;
+            }
+            return Strength;
         }
 
         private int DetermineFix(int fix, int quality)

@@ -15,6 +15,7 @@ namespace windesrace_v2
         {
             _currentRace = race;
             SetGraphics();
+            Console.Clear();
         }
 
         public static void OnNextRace(object o, NextRaceArgs e)
