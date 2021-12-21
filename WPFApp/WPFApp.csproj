@@ -19,15 +19,33 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Graphics\Section\Corner.png" />
-    <Content Include="Graphics\Section\Finish.png" />
-    <Content Include="Graphics\Section\Start.png" />
-    <Content Include="Graphics\Section\Straight.png" />
-    <Content Include="Graphics\Spacecraft\BlueSC.png" />
-    <Content Include="Graphics\Spacecraft\GreenSC.png" />
-    <Content Include="Graphics\Spacecraft\GreySC.png" />
-    <Content Include="Graphics\Spacecraft\RedSC.png" />
-    <Content Include="Graphics\Spacecraft\YellowSC.png" />
+    <Content Include="Graphics\Section\Corner.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\Section\Finish.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\Section\Start.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\Section\Straight.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\Spacecraft\BlueSC.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\Spacecraft\GreenSC.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\Spacecraft\GreySC.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\Spacecraft\RedSC.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\Spacecraft\YellowSC.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

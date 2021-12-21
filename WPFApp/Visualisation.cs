@@ -15,7 +15,7 @@ namespace WPFApp
 
         #region Sizes
 
-        internal const int SectionDimensions = 164;
+        internal const int SectionDimensions = 210;
         private const int ParticipantWidth = 40;
         private const int ParticipantHeight = 32;
 
@@ -194,7 +194,7 @@ namespace WPFApp
                 (int x, int y) coord = (0, 0);
                 Bitmap bmp = new Bitmap(GetImageBasedOnTeamColor(p.TeamColor));
                 Bitmap resize = new Bitmap(bmp, new Size(40 ,32));
-                Bitmap rotatedP = RotateParticipant(resize, section);
+                Bitmap rotatedP = RotateParticipant(resize, section, distance);
                 if (IsSectionACorner(section.SectionType))
                 {
                     coord = DetermineParticipantCoordinatesCircle(p, isLeft, section, distance);
@@ -213,7 +213,7 @@ namespace WPFApp
             {
                 case 0:
                     result.x += GetLRPositionOnSection(isLeft);
-                    result.y += DistanceInPixels(distance);
+                    result.y += DistanceInPixels(Section.SectionLength) - DistanceInPixels(distance);
                     break;
                 case 1:
                     result.x += DistanceInPixels(distance);
@@ -221,7 +221,7 @@ namespace WPFApp
                     break;
                 case 2:
                     result.x += GetLRPositionOnSection(isLeft);
-                    result.y += DistanceInPixels(Section.SectionLength) - DistanceInPixels(distance);
+                    result.y += DistanceInPixels(distance);
                     break;
                 case 3:
                     result.x += DistanceInPixels(Section.SectionLength) - DistanceInPixels(distance);
@@ -236,22 +236,20 @@ namespace WPFApp
         // TODO makes function that calculates where the participants needs to be drawn while in a corner.
         private static (int x, int y) DetermineParticipantCoordinatesCircle(IParticipant p, bool isLeft, Section section, int distance)
         {
-            (int x, int y) result = (CalculateCoordinateBasedOnConsoleCoordinates(section.X), CalculateCoordinateBasedOnConsoleCoordinates(section.Y));
+            (int x, int y) sectionCoords = (CalculateCoordinateBasedOnConsoleCoordinates(section.X), CalculateCoordinateBasedOnConsoleCoordinates(section.Y));
 
             int angle = distance / (Section.SectionLength / 90);
-            int radius = GetRadius(section.SectionType, isLeft);
+
+            int radius = GetRadius(section.SectionType, isLeft) - 30;
 
             int x = (int)(radius * Math.Sin(Math.PI * 2 * angle / 360));
             int y = (int)(radius * Math.Cos(Math.PI * 2 * angle / 360));
 
-            result.x += x * 100 / 100;
-            result.y += y * 100 / 100;
-
-            return result;
+            x += x * 100 / 100;
+            y += y * 100 / 100;
+            return ReverseCoordsBasedOnDirectionAndSection(sectionCoords, (x, y), section.SectionType, section.Direction);
         }
-
-        // TODO makes function that calculates where a bitmap is rotated based on the sectiontype and direction.
-        private static Bitmap RotateParticipant(Bitmap p, Section section)
+        private static Bitmap RotateParticipant(Bitmap p, Section section, int distance)
         {
 
             Bitmap returnBitmap = new Bitmap(p.Width, p.Height);
@@ -263,7 +261,7 @@ namespace WPFApp
             //rotate
             if (IsSectionACorner(section.SectionType))
             {
-                g.RotateTransform(DetermineParticipantRotationInCorner(section.SectionType, section.Direction));
+                g.RotateTransform(DetermineParticipantRotationInCorner(section.SectionType, section.Direction, distance));
             }
             else
             {
@@ -323,16 +321,72 @@ namespace WPFApp
             return isLeft ? SectionDimensions / 2 - SectionPaddingInside - ParticipantHeight : SectionDimensions / 2 + SectionPaddingInside;
         }
 
-        private static int DetermineParticipantRotationInCorner(SectionTypes st, int dir)
+        private static int DetermineParticipantRotationInCorner(SectionTypes st, int dir, int distance)
         {
-            if ((st == SectionTypes.RightCorner && dir == 0) || (st == SectionTypes.LeftCorner && dir == 1)){ return 45; }
+            if ((st == SectionTypes.RightCorner && dir == 0) || (st == SectionTypes.LeftCorner && dir == 1)){ return distance / (Section.SectionLength / 90); }
 
-            if ((st == SectionTypes.RightCorner && dir == 1) || (st == SectionTypes.LeftCorner && dir == 2)) { return 135; }
+            if ((st == SectionTypes.RightCorner && dir == 1) || (st == SectionTypes.LeftCorner && dir == 2)) { return 90 + distance / (Section.SectionLength / 90); }
 
-            if ((st == SectionTypes.RightCorner && dir == 2) || (st == SectionTypes.LeftCorner && dir == 3)) { return 225; }
+            if ((st == SectionTypes.RightCorner && dir == 2) || (st == SectionTypes.LeftCorner && dir == 3)) { return 180 + distance / (Section.SectionLength / 90); }
 
-            if ((st == SectionTypes.RightCorner && dir == 3) || (st == SectionTypes.LeftCorner && dir == 0)) { return 315; }
+            if ((st == SectionTypes.RightCorner && dir == 3) || (st == SectionTypes.LeftCorner && dir == 0)) { return 270 + distance / (Section.SectionLength / 90); }
             throw new Exception($"Wrong sectiontype or direction entered in DetermineParticipantRotationInCorner sectiontype:{st} direction:{dir}");
+        }
+        private static (int x, int y) ReverseCoordsBasedOnDirectionAndSection((int x, int y) sectionCoords,(int x, int y) circleCoords, SectionTypes st, int dir)
+        {
+            (int x, int y) resultCircle = (0,0);
+            if (st == SectionTypes.LeftCorner)
+            {
+                switch (dir)
+                {
+                    case 0:
+                        resultCircle.x = circleCoords.y;
+                        resultCircle.y = SectionDimensions - circleCoords.x;
+                        break;
+                    case 1:
+                        resultCircle.x = circleCoords.x;
+                        resultCircle.y = circleCoords.y;
+                        break;
+                    case 2:
+                        resultCircle.x = SectionDimensions - circleCoords.y;
+                        resultCircle.y = circleCoords.x;
+                        break;
+                    case 3:
+                        resultCircle.x = SectionDimensions - circleCoords.x;
+                        resultCircle.y = SectionDimensions - circleCoords.y;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else if (st == SectionTypes.RightCorner)
+            {
+                switch (dir)
+                {
+                    case 0:
+                        resultCircle = circleCoords;
+                        break;
+                    case 1:
+                        resultCircle = circleCoords;
+                        break;
+                    case 2:
+                        resultCircle = circleCoords;
+                        break;
+                    case 3:
+                        resultCircle = circleCoords;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            sectionCoords.x += resultCircle.x - ParticipantWidth;
+            sectionCoords.y += resultCircle.y - ParticipantHeight;
+            return sectionCoords;
+        }
+        private static int InverseCoord(int coord, int max)
+        {
+            return max - coord;
         }
 
     }

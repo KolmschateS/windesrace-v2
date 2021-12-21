@@ -11,8 +11,8 @@ namespace Model
         public bool IsBroken { get; set; }
         public int Strength { get; set; }
         public int Fix { get; set; }
-        private readonly int _minParameterValue = 10;
-        private readonly int _maxParameterValue = 20;
+        private readonly int _minParameterValue = 5;
+        private readonly int _maxParameterValue = 10;
 
         public Spacecraft(int quality, int performance, int speed, bool isBroken)
         {
@@ -48,7 +48,7 @@ namespace Model
         private bool DetermineIsBroken(int strength, Random random)
         {
             // If the spacecraft is not broken, determine it with random and the current strength of the spacecraft
-            if (!IsBroken) { return random.Next(0, strength) == 0; }
+            if (!IsBroken) { return false; return random.Next(0, strength) == 0; }
             
             // The spacecraft is broken, determine if the current Fix is high enough to repair it
             if (DetermineFix(Fix, Quality) > 100)
