@@ -12,6 +12,17 @@ namespace Controller
         public TrackData()
         {
             Tracks = new List<Track>();
+            Track Right = new Track("Earth", new SectionTypes[]
+            {
+                SectionTypes.Finish,
+                SectionTypes.StartGrid,
+                SectionTypes.RightCorner,
+                SectionTypes.RightCorner,
+                SectionTypes.RightCorner,
+                SectionTypes.RightCorner,
+            }, 3);
+            Tracks.Add(Right);
+
             Track Circle = new Track("Earth", new SectionTypes[]
             {
                 SectionTypes.StartGrid,

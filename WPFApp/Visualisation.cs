@@ -15,7 +15,7 @@ namespace WPFApp
 
         #region Sizes
 
-        internal const int SectionDimensions = 210;
+        internal const int SectionDimensions = 168;
         private const int ParticipantWidth = 40;
         private const int ParticipantHeight = 32;
 
@@ -246,8 +246,6 @@ namespace WPFApp
             int x = (int)(radius * Math.Sin(Math.PI * 2 * angle / 360));
             int y = (int)(radius * Math.Cos(Math.PI * 2 * angle / 360));
 
-            x += x * 100 / 100;
-            y += y * 100 / 100;
             return ReverseCoordsBasedOnDirectionAndSection(sectionCoords, (x, y), section.SectionType, section.Direction);
         }
         private static Bitmap RotateParticipant(Bitmap p, Section section, int distance)
@@ -310,7 +308,7 @@ namespace WPFApp
         }
         private static int GetRadius(SectionTypes st, bool isLeft)
         {
-            // Checks if the corner goes to right and the position is a the inside
+            // Checks if the corner goes to right and the position is at the inside
             bool IsInnerRadius = (st == SectionTypes.LeftCorner && isLeft) || (st == SectionTypes.RightCorner && !isLeft);
 
             // If the corner is on the inside return the outerPadding otherwise return the position to the middle
@@ -319,7 +317,7 @@ namespace WPFApp
 
         private static int GetLRPositionOnSection(bool isLeft)
         {
-            return isLeft ? SectionDimensions / 2 - SectionPaddingInside - ParticipantHeight : SectionDimensions / 2 + SectionPaddingInside;
+            return isLeft ? SectionDimensions / 2 - SectionPaddingInside - ParticipantWidth : SectionDimensions / 2 + SectionPaddingInside;
         }
 
         private static int DetermineParticipantRotationInCorner(SectionTypes st, int dir, int distance)
@@ -365,7 +363,8 @@ namespace WPFApp
                 switch (dir)
                 {
                     case 0:
-                        resultCircle = circleCoords;
+                        resultCircle.x = circleCoords.y;
+                        resultCircle.y = SectionDimensions - circleCoords.x;
                         break;
                     case 1:
                         resultCircle = circleCoords;
@@ -381,8 +380,8 @@ namespace WPFApp
                 }
             }
 
-            sectionCoords.x += resultCircle.x - ParticipantWidth;
-            sectionCoords.y += resultCircle.y - ParticipantHeight;
+            sectionCoords.x += resultCircle.x - (ParticipantWidth / 2);
+            sectionCoords.y += resultCircle.y - (ParticipantHeight / 2);
             return sectionCoords;
         }
         private static int InverseCoord(int coord, int max)
