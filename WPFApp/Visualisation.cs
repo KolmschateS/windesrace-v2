@@ -203,6 +203,7 @@ namespace WPFApp
                 {
                     coord = DetermineParticipantCoordinatesStraight(p, isLeft, section, distance);
                 }
+                //g.DrawEllipse(new Pen(new SolidBrush(Color.White)),coord.x, coord.y, 5, 5);
                 g.DrawImage(rotatedP, coord.x, coord.y);
             }
         }
@@ -240,7 +241,7 @@ namespace WPFApp
 
             int angle = distance / (Section.SectionLength / 90);
 
-            int radius = GetRadius(section.SectionType, isLeft) - 30;
+            int radius = GetRadius(section.SectionType, isLeft);
 
             int x = (int)(radius * Math.Sin(Math.PI * 2 * angle / 360));
             int y = (int)(radius * Math.Cos(Math.PI * 2 * angle / 360));
@@ -313,7 +314,7 @@ namespace WPFApp
             bool IsInnerRadius = (st == SectionTypes.LeftCorner && isLeft) || (st == SectionTypes.RightCorner && !isLeft);
 
             // If the corner is on the inside return the outerPadding otherwise return the position to the middle
-            return IsInnerRadius ? GetLRPositionOnSection(true) : GetLRPositionOnSection(false);
+            return GetLRPositionOnSection(IsInnerRadius);
         }
 
         private static int GetLRPositionOnSection(bool isLeft)
@@ -323,13 +324,13 @@ namespace WPFApp
 
         private static int DetermineParticipantRotationInCorner(SectionTypes st, int dir, int distance)
         {
-            if ((st == SectionTypes.RightCorner && dir == 0) || (st == SectionTypes.LeftCorner && dir == 1)){ return distance / (Section.SectionLength / 90); }
+            if ((st == SectionTypes.RightCorner && dir == 0) || (st == SectionTypes.LeftCorner && dir == 1)){ return 45; }
 
-            if ((st == SectionTypes.RightCorner && dir == 1) || (st == SectionTypes.LeftCorner && dir == 2)) { return 90 + distance / (Section.SectionLength / 90); }
+            if ((st == SectionTypes.RightCorner && dir == 1) || (st == SectionTypes.LeftCorner && dir == 2)) { return 90 + 45; }
 
-            if ((st == SectionTypes.RightCorner && dir == 2) || (st == SectionTypes.LeftCorner && dir == 3)) { return 180 + distance / (Section.SectionLength / 90); }
+            if ((st == SectionTypes.RightCorner && dir == 2) || (st == SectionTypes.LeftCorner && dir == 3)) { return 180 + 45; }
 
-            if ((st == SectionTypes.RightCorner && dir == 3) || (st == SectionTypes.LeftCorner && dir == 0)) { return 270 + distance / (Section.SectionLength / 90); }
+            if ((st == SectionTypes.RightCorner && dir == 3) || (st == SectionTypes.LeftCorner && dir == 0)) { return 270 + 45; }
             throw new Exception($"Wrong sectiontype or direction entered in DetermineParticipantRotationInCorner sectiontype:{st} direction:{dir}");
         }
         private static (int x, int y) ReverseCoordsBasedOnDirectionAndSection((int x, int y) sectionCoords,(int x, int y) circleCoords, SectionTypes st, int dir)
