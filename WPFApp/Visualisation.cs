@@ -19,8 +19,8 @@ namespace WPFApp
         private const int ParticipantWidth = 40;
         private const int ParticipantHeight = 32;
 
-        private const int SectionPaddingInside = 10;
-        private const int SectionPaddingOutside = 50;
+        private const int SectionPaddingInside = 25;
+        private const int SectionPaddingOutside = 40;
 
         #endregion
 
@@ -231,6 +231,8 @@ namespace WPFApp
                 default:
                     throw(new Exception($"Direction out of bounds in DetermineParticipantCoordinates: Direction: {section.Direction}"));
             }
+            result.x -= ParticipantWidth / 2;
+            //result.y -= ParticipantHeight / 2;
             return result;
         }
 
@@ -239,7 +241,8 @@ namespace WPFApp
         {
             (int x, int y) sectionCoords = (CalculateCoordinateBasedOnConsoleCoordinates(section.X), CalculateCoordinateBasedOnConsoleCoordinates(section.Y));
 
-            int angle = distance / (Section.SectionLength / 90);
+
+            int angle = CalculateAngle(section.SectionType, distance);
 
             int radius = GetRadius(section.SectionType, isLeft);
 
@@ -247,6 +250,10 @@ namespace WPFApp
             int y = (int)(radius * Math.Cos(Math.PI * 2 * angle / 360));
 
             return ReverseCoordsBasedOnDirectionAndSection(sectionCoords, (x, y), section.SectionType, section.Direction);
+        }
+        private static int CalculateAngle(SectionTypes st, int distance)
+        {
+            return st == SectionTypes.LeftCorner ? distance / (Section.SectionLength / 90) : 90 - (distance / (Section.SectionLength / 90));
         }
         private static Bitmap RotateParticipant(Bitmap p, Section section, int distance)
         {
@@ -317,7 +324,8 @@ namespace WPFApp
 
         private static int GetLRPositionOnSection(bool isLeft)
         {
-            return isLeft ? SectionDimensions / 2 - SectionPaddingInside - ParticipantWidth : SectionDimensions / 2 + SectionPaddingInside;
+            int middle = SectionDimensions / 2;
+            return isLeft ? middle + SectionPaddingInside : middle - SectionPaddingInside;
         }
 
         private static int DetermineParticipantRotationInCorner(SectionTypes st, int dir, int distance)
@@ -343,8 +351,7 @@ namespace WPFApp
                         resultCircle.y = SectionDimensions - circleCoords.x;
                         break;
                     case 1:
-                        resultCircle.x = circleCoords.x;
-                        resultCircle.y = circleCoords.y;
+                        resultCircle = circleCoords;
                         break;
                     case 2:
                         resultCircle.x = SectionDimensions - circleCoords.y;
@@ -363,17 +370,19 @@ namespace WPFApp
                 switch (dir)
                 {
                     case 0:
-                        resultCircle.x = circleCoords.y;
-                        resultCircle.y = SectionDimensions - circleCoords.x;
+                        resultCircle.x = SectionDimensions - circleCoords.x;
+                        resultCircle.y = SectionDimensions - circleCoords.y;
                         break;
                     case 1:
-                        resultCircle = circleCoords;
+                        resultCircle.x = circleCoords.y;
+                        resultCircle.y = SectionDimensions - circleCoords.x;
                         break;
                     case 2:
                         resultCircle = circleCoords;
                         break;
                     case 3:
-                        resultCircle = circleCoords;
+                        resultCircle.x = SectionDimensions - circleCoords.y;
+                        resultCircle.y = circleCoords.x;
                         break;
                     default:
                         break;

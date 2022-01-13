@@ -12,39 +12,6 @@ namespace Controller
         public TrackData()
         {
             Tracks = new List<Track>();
-            Track Right = new Track("Earth", new SectionTypes[]
-            {
-                SectionTypes.Finish,
-                SectionTypes.StartGrid,
-                SectionTypes.RightCorner,
-                SectionTypes.RightCorner,
-                SectionTypes.RightCorner,
-                SectionTypes.RightCorner,
-            }, 3);
-            Tracks.Add(Right);
-
-            Track Circle = new Track("Earth", new SectionTypes[]
-            {
-                SectionTypes.StartGrid,
-                SectionTypes.Finish,
-                SectionTypes.Straight,
-                SectionTypes.RightCorner,
-                SectionTypes.RightCorner,
-                SectionTypes.RightCorner,
-                SectionTypes.Straight,
-                SectionTypes.Straight,
-                SectionTypes.RightCorner,
-                SectionTypes.LeftCorner,
-                SectionTypes.LeftCorner,
-                SectionTypes.Straight,
-                SectionTypes.LeftCorner,
-                SectionTypes.Straight,
-                SectionTypes.LeftCorner,
-                SectionTypes.Straight,
-                SectionTypes.Straight,
-                SectionTypes.Straight,
-            }, 3);
-            Tracks.Add(Circle);
 
             Track Earth = new Track("Earth", new SectionTypes[]
             {
@@ -70,7 +37,7 @@ namespace Controller
                 SectionTypes.RightCorner
                 
             }, 3);
-            Tracks.Add(Earth);
+            //Tracks.Add(Earth);
 
             Track Sun = new Track("Sun", new SectionTypes[]
             {
