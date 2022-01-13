@@ -22,7 +22,7 @@ namespace Controller
         public Dictionary<Section, SectionData> Positions { get; set; }
         private readonly int _frontStartGridDistance = 750;
         private readonly int _backStartGridDistance = 250;
-        private readonly int _maxLaps = 20;
+        private readonly int _maxLaps = 1;
         public bool IsFinishFlagOut { get; set; }
         public bool AreAllFinished { get; set; }
 

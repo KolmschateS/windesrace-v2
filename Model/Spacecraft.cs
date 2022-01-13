@@ -12,7 +12,7 @@ namespace Model
         public int Strength { get; set; }
         public int Fix { get; set; }
         private readonly int _minParameterValue = 5;
-        private readonly int _maxParameterValue = 10;
+        private readonly int _maxParameterValue = 15;
 
         public Spacecraft(int quality, int performance, int speed, bool isBroken)
         {

@@ -9,7 +9,7 @@ namespace Controller
         public static Competition Competition { get; set; }
         public static Race CurrentRace { get; set; }
         public static event EventHandler<NextRaceArgs> NextRace;
-        public static readonly int _baseQuality = 3, _basePerformance = 3, _baseSpeed = 3;
+        public static readonly int _baseQuality = 4, _basePerformance = 4, _baseSpeed = 4;
         private static Random _random { get; set; }
 
         // Sort of a constructor. Initializes the data used in the application
