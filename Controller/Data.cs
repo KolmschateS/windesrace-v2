@@ -8,7 +8,7 @@ namespace Controller
     {
         public static Competition Competition { get; set; }
         public static Race CurrentRace { get; set; }
-        public static event EventHandler<NextRaceArgs> NextRace;
+        public static event EventHandler<NextRaceArgs> NextRaceEvent;
         public static readonly int _baseQuality = 4, _basePerformance = 4, _baseSpeed = 4;
         private static Random _random { get; set; }
 
@@ -48,7 +48,7 @@ namespace Controller
             // Clean up previous race
             CurrentRace?.CleanUp();
             CurrentRace = new Race(Competition.NextTrack(), ResetWearOfParticipants(Competition.Participants));
-            NextRace?.Invoke(null, new NextRaceArgs(CurrentRace));
+            NextRaceEvent?.Invoke(null, new NextRaceArgs(CurrentRace));
         }
         
         // Random string generator for random names

@@ -205,6 +205,7 @@ namespace WPFApp
                 }
                 //g.DrawEllipse(new Pen(new SolidBrush(Color.White)),coord.x, coord.y, 5, 5);
                 g.DrawImage(rotatedP, coord.x, coord.y);
+                if (p.Equipment.IsBroken) { g.DrawImage(ImageCache.GetBitmap(Broken), coord.x, coord.y); }
             }
         }
         private static (int x, int y) DetermineParticipantCoordinatesStraight(IParticipant p, bool isLeft, Section section, int distance)
@@ -392,10 +393,6 @@ namespace WPFApp
             sectionCoords.x += resultCircle.x - (ParticipantWidth / 2);
             sectionCoords.y += resultCircle.y - (ParticipantHeight / 2);
             return sectionCoords;
-        }
-        private static int InverseCoord(int coord, int max)
-        {
-            return max - coord;
         }
 
     }

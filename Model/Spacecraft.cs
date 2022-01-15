@@ -19,7 +19,6 @@ namespace Model
             Quality = quality;
             Performance = performance;
             Speed = speed;
-            IsBroken = isBroken;
             Strength = 100;
             Fix = 0;
         }
@@ -48,7 +47,7 @@ namespace Model
         private bool DetermineIsBroken(int strength, Random random)
         {
             // If the spacecraft is not broken, determine it with random and the current strength of the spacecraft
-            if (!IsBroken) { return false; return random.Next(0, strength) == 0; }
+            if (!IsBroken) { return random.Next(0, strength) == 0; }
             
             // The spacecraft is broken, determine if the current Fix is high enough to repair it
             if (DetermineFix(Fix, Quality) > 100)

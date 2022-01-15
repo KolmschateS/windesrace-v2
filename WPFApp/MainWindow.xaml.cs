@@ -23,13 +23,16 @@ namespace WPFApp
     /// </summary>
     public partial class MainWindow : Window
     {
+        private CompetitionStatisticsWindow _competitionStatisticsWindow;
+        private RaceStatisticsWindow _raceStatisticsWindow;
+
         public MainWindow()
         {
             InitializeComponent();
 
             ImageCache.Initialize();
             Data.Initialize();
-            Data.NextRace += OnNextRaceEvent;
+            Data.NextRaceEvent += OnNextRaceEvent;
             Data.SetNextRace();
         }
 
@@ -39,6 +42,8 @@ namespace WPFApp
             Visualisation.Initialize(e.Race);
 
             e.Race.DriversChanged += OnDriversChanged;
+
+
         }
 
         private void OnDriversChanged(object o, DriversChangedEventArgs e)
@@ -50,6 +55,31 @@ namespace WPFApp
                     this.TrackImage.Source = null;
                     this.TrackImage.Source = Visualisation.DrawTrack(e.Track);
                 }));
+        }
+
+        private void MenuItem_Exit_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+
+        private void MenuItem_ToggleRaceStatistics_Click(object sender, RoutedEventArgs e)
+        {
+            _raceStatisticsWindow = new RaceStatisticsWindow();
+
+            Data.NextRaceEvent += ((RaceStatisticsDataContext)_raceStatisticsWindow.DataContext).OnNextRace;
+            ((RaceStatisticsDataContext)_raceStatisticsWindow.DataContext).OnNextRace(null, new NextRaceArgs(Data.CurrentRace));
+
+            _raceStatisticsWindow.Show();
+        }
+
+        private void MenuItem_ToggleCompetitionStatistics_Click(object sender, RoutedEventArgs e)
+        {
+            _competitionStatisticsWindow = new CompetitionStatisticsWindow();
+
+            //Data.NextRaceEvent += ((CompetitionStatisticsDataContext)_competitionStatisticsWindow.DataContext).OnNextRace;
+            //((CompetitionStatisticsDataContext)_competitionStatisticsWindow.DataContext).OnNextRace(null, new NextRaceArgs(Data.CurrentRace));
+
+            _competitionStatisticsWindow.Show();
         }
     }
 }

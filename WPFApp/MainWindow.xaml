@@ -8,5 +8,14 @@
         Title="MainWindow" Height="1200" Width="1200">
     <Grid HorizontalAlignment="Left" Width="1200" Background="Black">
         <Image x:Name="TrackImage" Margin="50px"/>
+        <DockPanel>
+            <Menu DockPanel.Dock="Top" Height="20" VerticalAlignment="Top">
+                <MenuItem Header="Menu">
+                    <MenuItem Header="Toggle competition statistics" Click="MenuItem_ToggleCompetitionStatistics_Click"/>
+                    <MenuItem Header="Toggle race statistics" Click="MenuItem_ToggleRaceStatistics_Click"/>
+                    <MenuItem Header="Stop competition" Click="MenuItem_Exit_Click"/>
+                </MenuItem>
+            </Menu>
+        </DockPanel>
     </Grid>
 </Window>

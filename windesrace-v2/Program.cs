@@ -9,7 +9,7 @@ namespace windesrace_v2
         static void Main(string[] args)
         {
             Data.Initialize();
-            Data.NextRace += Visualisation.OnNextRace;
+            Data.NextRaceEvent += Visualisation.OnNextRace;
             Data.SetNextRace();
 
             for (;;)
