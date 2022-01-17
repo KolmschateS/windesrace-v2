@@ -21,10 +21,10 @@ namespace ControllerTest
                 "test", 
                 50, 
                 new Spacecraft(
-                    50, 
-                    50, 
-                    50, 
-                    false), 
+                    50,
+                    50,
+                    50,
+                    isBroken: false), 
                 TeamColors.Blue);
             _participants.Add(astronaut);
             

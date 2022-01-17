@@ -9,7 +9,7 @@ namespace Controller
         public static Competition Competition { get; set; }
         public static Race CurrentRace { get; set; }
         public static event EventHandler<NextRaceArgs> NextRaceEvent;
-        public static readonly int _baseQuality = 4, _basePerformance = 4, _baseSpeed = 4;
+        public static readonly int _baseQuality = 4, _basePerformance = 4, _baseSpeed = 4, StrengthInit = 3000;
         private static Random _random { get; set; }
 
         // Sort of a constructor. Initializes the data used in the application
@@ -26,7 +26,7 @@ namespace Controller
             // Adds as much participants given with the method
             for (int i = 0; i < max; i++)
             {
-                Spacecraft spacecraft = new Spacecraft(_baseQuality, _basePerformance, _baseSpeed, false);
+                Spacecraft spacecraft = new Spacecraft(_baseQuality, _basePerformance, _baseSpeed, StrengthInit ,isBroken: false);
                 Astronaut astronaut = new Astronaut(RandomNames(10), 0, spacecraft, RandomColor());
                 Competition.Participants.Add(astronaut);
             }
@@ -71,7 +71,7 @@ namespace Controller
             List<IParticipant> result = new List<IParticipant>();
             foreach (var participant in participants)
             {
-                participant.Equipment.Strength = 100;
+                participant.Equipment.Strength = StrengthInit;
                 participant.Equipment.Fix = 0;
                 result.Add(participant);
             }

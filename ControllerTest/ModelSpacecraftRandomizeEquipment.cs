@@ -14,7 +14,7 @@ namespace ControllerTest
         [SetUp]
         public void SetUp()
         {
-            _spacecraft = new Spacecraft(Data._baseQuality, Data._basePerformance, Data._baseSpeed, false);
+            _spacecraft = new Spacecraft(Data._baseQuality, Data._basePerformance, Data._baseSpeed, isBroken: false);
         }
         
         [Test]

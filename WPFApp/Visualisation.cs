@@ -268,7 +268,9 @@ namespace WPFApp
             //rotate
             if (IsSectionACorner(section.SectionType))
             {
-                g.RotateTransform(DetermineParticipantRotationInCorner(section.SectionType, section.Direction, distance));
+                // TODO fix this
+                g.RotateTransform(-CalculateAngle(section.SectionType, distance) - 90);
+                //g.RotateTransform(DetermineParticipantRotationInCorner(section.SectionType, CalculateAngle(section.SectionType, distance)));
             }
             else
             {
@@ -329,16 +331,9 @@ namespace WPFApp
             return isLeft ? middle + SectionPaddingInside : middle - SectionPaddingInside;
         }
 
-        private static int DetermineParticipantRotationInCorner(SectionTypes st, int dir, int distance)
+        private static int DetermineParticipantRotationInCorner(SectionTypes st, int angle)
         {
-            if ((st == SectionTypes.RightCorner && dir == 0) || (st == SectionTypes.LeftCorner && dir == 1)){ return 45; }
-
-            if ((st == SectionTypes.RightCorner && dir == 1) || (st == SectionTypes.LeftCorner && dir == 2)) { return 90 + 45; }
-
-            if ((st == SectionTypes.RightCorner && dir == 2) || (st == SectionTypes.LeftCorner && dir == 3)) { return 180 + 45; }
-
-            if ((st == SectionTypes.RightCorner && dir == 3) || (st == SectionTypes.LeftCorner && dir == 0)) { return 270 + 45; }
-            throw new Exception($"Wrong sectiontype or direction entered in DetermineParticipantRotationInCorner sectiontype:{st} direction:{dir}");
+            return 0;
         }
         private static (int x, int y) ReverseCoordsBasedOnDirectionAndSection((int x, int y) sectionCoords,(int x, int y) circleCoords, SectionTypes st, int dir)
         {

@@ -8,18 +8,23 @@ namespace Model
         public int Quality { get; set; }
         public int Performance { get; set; }
         public int Speed { get; set; }
+        public double FakeSpeed { get; set; }
         public bool IsBroken { get; set; }
         public int Strength { get; set; }
         public int Fix { get; set; }
         private readonly int _minParameterValue = 5;
         private readonly int _maxParameterValue = 15;
+        private readonly int _fakeSpeedFactor = 62;
+        private int InitStrength { get; set; }
 
-        public Spacecraft(int quality, int performance, int speed, bool isBroken)
+        public Spacecraft(int quality, int performance, int speed, int initStrength, bool isBroken)
         {
             Quality = quality;
             Performance = performance;
             Speed = speed;
-            Strength = 100;
+            FakeSpeed = Speed * _fakeSpeedFactor;
+            InitStrength = initStrength;
+            IsBroken = isBroken;
             Fix = 0;
         }
 
@@ -28,15 +33,18 @@ namespace Model
             Quality = RandomizeParameter(Quality, random);
             Performance = RandomizeParameter(Performance, random);
             Speed = RandomizeParameter(Speed, random);
-            
+
             Strength = DetermineStrength();
             IsBroken = DetermineIsBroken(Strength, random);
+
+
+            FakeSpeed = IsBroken ? 0 : Math.Round(Speed * random.Next(_fakeSpeedFactor - 1, _fakeSpeedFactor + 1) + random.NextDouble(), 2);
         }
 
         private int RandomizeParameter(int param, Random random)
         {
             // Change in parameter
-            int change = random.Next(-5, 5);
+            int change = random.Next(0, 25) == 0 ? random.Next(-5, 5) : 0;
 
             // Result of the parameter and the change
             int result = param + change;
@@ -54,14 +62,14 @@ namespace Model
             {
                 // The fix is high enough to repair the spacecraft
                 // rest the strength to 100 and return false to confirm it is not broken anymore
-                Strength = 100;
+                Strength = InitStrength;
                 Fix = 0;
                 return false; 
             }
             else
             {
                 Fix = DetermineFix(Fix, Quality);
-                Strength = Fix;
+                Strength = InitStrength;
             }
             return true;
         }
@@ -71,9 +79,9 @@ namespace Model
             {
                 return 0;
             }
-            if (Strength - Quality / 10 > 0)
+            if (Strength - Quality > 0)
             {
-                return Strength - Quality / 10;
+                return Strength - Quality;
             }
             return Strength;
         }

@@ -17,7 +17,7 @@ namespace ControllerTest
         [Test]
         public void GettingParticipantsPossible()
         {
-            Spacecraft spacecraft = new Spacecraft(50, 50, 50, false);
+            Spacecraft spacecraft = new Spacecraft(50, 50, 50, isBroken: false);
             Astronaut astronaut = new Astronaut("TestAstronaut", 0, spacecraft, TeamColors.Red);
             _competition.Participants.Add(astronaut);
             IParticipant result = _competition.Participants[0];
