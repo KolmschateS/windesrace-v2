@@ -9,7 +9,7 @@ namespace Controller
         public static Competition Competition { get; set; }
         public static Race CurrentRace { get; set; }
         public static event EventHandler<NextRaceArgs> NextRaceEvent;
-        public static readonly int _baseQuality = 4, _basePerformance = 4, _baseSpeed = 4, StrengthInit = 3000;
+        public static readonly int _baseQuality = 15, _basePerformance = 15, _baseSpeed = 15, StrengthInit = 5000;
         private static Random _random { get; set; }
 
         // Sort of a constructor. Initializes the data used in the application
@@ -17,7 +17,7 @@ namespace Controller
         {
             _random = new Random(DateTime.Now.Millisecond);
             Competition = new Competition();
-            AddParticipantsToCompetition(12);
+            AddParticipantsToCompetition(6);
             AddTracksToCompetition();
         }
 

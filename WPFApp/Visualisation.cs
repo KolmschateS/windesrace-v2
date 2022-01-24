@@ -203,7 +203,6 @@ namespace WPFApp
                 {
                     coord = DetermineParticipantCoordinatesStraight(p, isLeft, section, distance);
                 }
-                //g.DrawEllipse(new Pen(new SolidBrush(Color.White)),coord.x, coord.y, 5, 5);
                 g.DrawImage(rotatedP, coord.x, coord.y);
                 if (p.Equipment.IsBroken) { g.DrawImage(ImageCache.GetBitmap(Broken), coord.x, coord.y); }
             }
@@ -270,7 +269,6 @@ namespace WPFApp
             {
                 // TODO fix this
                 g.RotateTransform(-CalculateAngle(section.SectionType, distance) - 90);
-                //g.RotateTransform(DetermineParticipantRotationInCorner(section.SectionType, CalculateAngle(section.SectionType, distance)));
             }
             else
             {

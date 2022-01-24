@@ -6,6 +6,7 @@ namespace Model
     {
         public List<IParticipant> Participants { get; set; }
         public Queue<Track> Tracks { get; set; }
+        public static readonly List<int> PointSystem = new List<int> { 10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
 
         public Competition()
         {

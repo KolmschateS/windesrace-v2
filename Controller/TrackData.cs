@@ -13,6 +13,22 @@ namespace Controller
         {
             Tracks = new List<Track>();
 
+            Track smallie = new Track("smallie", new SectionTypes[]
+            {
+                SectionTypes.StartGrid,
+                SectionTypes.StartGrid,
+                SectionTypes.Finish,
+                SectionTypes.RightCorner,
+                SectionTypes.RightCorner,
+                SectionTypes.Straight,
+                SectionTypes.Straight,
+                SectionTypes.Straight,
+                SectionTypes.RightCorner,
+                SectionTypes.RightCorner
+
+            }, 3);
+            Tracks.Add(smallie);
+
             Track Earth = new Track("Earth", new SectionTypes[]
             {
                 SectionTypes.StartGrid,
@@ -37,7 +53,7 @@ namespace Controller
                 SectionTypes.RightCorner
                 
             }, 3);
-            //Tracks.Add(Earth);
+            Tracks.Add(Earth);
 
             Track Sun = new Track("Sun", new SectionTypes[]
             {

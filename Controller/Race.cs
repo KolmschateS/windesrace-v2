@@ -1,32 +1,32 @@
-﻿using System;
+﻿using Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 using System.Timers;
-using Model;
 
 namespace Controller
 {
     public class Race
     {
         private readonly Timer _timer;
-        private const int TimerInterval = 100;
+        private const int TimerInterval = 200;
 
         public event EventHandler<DriversChangedEventArgs> DriversChanged;
+        public event EventHandler<DriverMovedEventArgs> ADriverMoved;
         public Track Track { get; set; }
         public List<IParticipant> Pilots { get; set; }
-        public List<Classification> Classifications{ get; set; }
+        public List<Classification> Classifications { get; set; }
+        public Dictionary<IParticipant, Classification> ClassificationsCache { get; set; }
+        public Dictionary<IParticipant, Classification> DefinitiveClassifications { get; set; }
         public DateTime StartTime { get; set; }
         private Random Random { get; set; }
-        public Dictionary<IParticipant, int> ParticipantLaps { get; set; }
-        public Dictionary<IParticipant, bool> ParticipantFinished { get; set; }
-        public Dictionary<IParticipant, int> ParticipantDistanceTravelled { get; set; }
+        public List<IParticipant> ParticipantFinished { get; set; }
         public Dictionary<Section, SectionData> Positions { get; set; }
         private readonly int _frontStartGridDistance = 750;
         private readonly int _backStartGridDistance = 250;
         private readonly int _maxLaps = 1;
         public bool IsFinishFlagOut { get; set; }
-        public bool AreAllFinished { get; set; }
+        public int RaceLength { get; set; }
 
         // Constructor
         public Race(Track track, List<IParticipant> pilots)
@@ -36,18 +36,21 @@ namespace Controller
 
             Positions = new Dictionary<Section, SectionData>();
             Track = track;
-            ParticipantFinished = new Dictionary<IParticipant, bool>();
+            ParticipantFinished = new List<IParticipant>();
+            Classifications = new List<Classification>();
+            DefinitiveClassifications = new Dictionary<IParticipant, Classification>();
+            RaceLength = Track.TrackLength * _maxLaps;
+
             Pilots = GenerateQualificationList(pilots);
             SetPositionsWithStartGrid(track, Pilots);
-            
-            ParticipantLaps = SetParticipantLaps(Pilots);
-            Classifications = SetClassifications(Pilots);
+
+            ClassificationsCache = SetClassifications(Pilots);
 
             IsFinishFlagOut = false;
-            AreAllFinished = false;
 
             _timer = new Timer(TimerInterval);
             _timer.Elapsed += OnTimedEvent;
+            ADriverMoved += OnDriverMoved;
             Start();
         }
 
@@ -73,17 +76,9 @@ namespace Controller
                 List<IParticipant> result = new List<IParticipant>();
                 foreach (IParticipant pilot in pilots)
                 {
-                    if (ParticipantFinished.ContainsKey(pilot))
+                    if (ParticipantFinished.Contains(pilot))
                     {
-                        if (IsParticipantFinished(pilot))
-                        {
-                            result.Add(pilot);
-                        }
-                        else
-                        {
-                            pilot.Equipment.RandomizeEquipment(Random);
-                            result.Add(pilot);
-                        }
+                        result.Add(pilot);
                     }
                     else
                     {
@@ -99,7 +94,7 @@ namespace Controller
 
         public List<IParticipant> GenerateQualificationList(List<IParticipant> pilots)
         {
-            
+
             List<IParticipant> randomPilots = RandomizeEquipement(pilots);
             try
             {
@@ -111,20 +106,12 @@ namespace Controller
                 throw;
             }
         }
-
-        private Dictionary<IParticipant, int> SetParticipantLaps(List<IParticipant> participants)
+        private Dictionary<IParticipant, Classification> SetClassifications(List<IParticipant> participants)
         {
-            Dictionary<IParticipant, int> result = new Dictionary<IParticipant, int>();
-            foreach (IParticipant aParticipant in participants)
-                result[aParticipant] = 0;
-            return result;
-        }
-        private List<Classification> SetClassifications(List<IParticipant> participants)
-        {
-            List<Classification> classifications = new List<Classification>();
+            Dictionary<IParticipant, Classification> classifications = new Dictionary<IParticipant, Classification>();
             foreach (IParticipant aParticipant in participants)
             {
-                classifications.Add(new Classification(aParticipant, 0));
+                classifications[aParticipant] = new Classification(aParticipant, StartTime, _maxLaps);
             }
             return classifications;
         }
@@ -142,13 +129,11 @@ namespace Controller
                 if (place > participants.Count - 1) break;
                 sectionData.Left = participants[place]; // If so set the sectiondata with the correct participant
                 sectionData.DistanceLeft = _frontStartGridDistance;
-                ParticipantDistanceTravelled[sectionData.Left] = CalculateParticipantDistanceAtStart(startgrid.Count, place);
 
                 // Checks if the to allocate place is also in the participants list 
                 if (place + 1 > participants.Count - 1) break;
                 sectionData.Right = participants[place + 1]; // If so set the sectiondata with the correct participant
                 sectionData.DistanceRight = _backStartGridDistance;
-                ParticipantDistanceTravelled[sectionData.Right] = CalculateParticipantDistanceAtStart(startgrid.Count, place + 1);
 
                 // Ups the place with 2 to continue to the next startgrid slots
                 place += 2;
@@ -168,14 +153,13 @@ namespace Controller
             Pilots = RandomizeEquipement(Pilots);
 
             // Moves the participants every timer trigger
-            MoveParticipants();
-
-            // Checks if all the participants are finished
-            AreAllParticipantsFinished();
+            MoveParticipants(eventArgs.SignalTime);
 
             // If all participants are finished the race needs to be cleared and the next Race must be initialized
-            if (AreAllFinished)
+            if (AreAllParticipantsFinished())
             {
+                _timer.Stop();
+                AssignPointsForParticipants(Classifications);
                 Data.SetNextRace();
             }
 
@@ -197,45 +181,60 @@ namespace Controller
         #endregion
 
         #region ClassificationRegion
-
-        /// <summary>
-        /// Calculates the distance of a participant based on its startgrid place
-        /// </summary>
-        /// <param name="gridSize"></param>
-        /// <param name="place"></param>
-        /// <returns>Returns the distance a participants has travelled comparted to the last place on the startgrid</returns>
-        public int CalculateParticipantDistanceAtStart(int gridSize, int place)
+        public void OnDriverMoved(object sender, DriverMovedEventArgs eventArgs)
         {
-            return (gridSize - place) * Section.SectionLength;
-        }
+            // Add passing
+            ClassificationsCache[eventArgs.Pilot].Passings.Push(new Passing(eventArgs.Section, eventArgs.TimeStamp));
+            ClassificationsCache[eventArgs.Pilot].Update();
+            ClassificationsCache[eventArgs.Pilot].Position = ToListClassificationsCache().IndexOf(ClassificationsCache[eventArgs.Pilot]) + 1;
 
-        public void ChangeParticipantDistanceTravelled()
-        {
+            // List all the classifications, so they can be read
+            Classifications = ToListClassificationsCache();
 
         }
 
-        public Classification DetermineClassification(IParticipant participant)
+        private List<Classification> ToListClassificationsCache()
         {
-            int pos = DeterminePosition(participant);
-            Classification classification = new Classification(participant, pos);
+            // First order by lapcount,
+            // then order by amount of sections travelled that lap
+            // then order by who finished the last section first, to determine who is in front the last section.
+            return ClassificationsCache.Values.OrderByDescending(x => x.LapCount).ThenByDescending(x => x.SectionCountThisLap).ThenBy(x => x.LatestSectionTimeStamp).ToList();
         }
-
-        public int DeterminePosition(IParticipant participant)
+        public void AssignPointsForParticipants(List<Classification> classifications)
         {
+            List<Classification> finalClassification = ClassificationsCache.Values.OrderByDescending(x => x.LapCount).ThenBy(x => x.TotalRaceTime).ToList();
+            foreach (IParticipant participant in Pilots)
+            {
+                int Position = ClassificationsCache[participant].Position;
+                int Add = AssignPoints(Position);
+                participant.Points += Add;
+            }
 
+        }
+        public static int AssignPoints(int position)
+        {
+            try
+            {
+                return Competition.PointSystem[position - 1];
+            }
+            catch
+            {
+                return 0;
+            }
         }
 
         #endregion
 
         #region ParticipantsMovement
 
-        public void MoveParticipants()
+        public void MoveParticipants(DateTime elapsedTime)
         {
             LinkedListNode<Section> node = Track.Sections.Last;
 
             while (node != null)
             {
                 SectionData currentSectionData = GetSectionData(node.Value);
+
                 Section targetSection = node.Next != null ? node.Next.Value : Track.Sections.First?.Value;
                 SectionData targetSectionData = GetSectionData(targetSection);
 
@@ -244,14 +243,14 @@ namespace Controller
                         SetSectionDistance(currentSectionData.Left, currentSectionData.DistanceLeft);
 
                 if (currentSectionData.DistanceLeft >= Section.SectionLength)
-                    MoveParticipant(node.Value, currentSectionData, targetSection, targetSectionData, true);
+                    MoveParticipant(node.Value, currentSectionData, targetSection, targetSectionData, true, elapsedTime);
 
                 if (currentSectionData.Right != null && !currentSectionData.Right.Equipment.IsBroken)
-                    currentSectionData.DistanceRight = SetSectionDistance(currentSectionData.Right,
-                        currentSectionData.DistanceRight);
+                    currentSectionData.DistanceRight
+                        = SetSectionDistance(currentSectionData.Right, currentSectionData.DistanceRight);
 
                 if (currentSectionData.DistanceRight >= Section.SectionLength)
-                    MoveParticipant(node.Value, currentSectionData, targetSection, targetSectionData, false);
+                    MoveParticipant(node.Value, currentSectionData, targetSection, targetSectionData, false, elapsedTime);
 
                 node = node.Previous;
             }
@@ -268,7 +267,7 @@ namespace Controller
         }
 
         public void MoveParticipant(Section currentSection, SectionData currentSectionData, Section targetSection,
-            SectionData targetSectionData, bool isLeft)
+            SectionData targetSectionData, bool isLeft, DateTime elapsedTime)
         {
             bool targetIsLeft = GetEmptyTargetMostToTheFront(targetSectionData);
             IParticipant participant = isLeft ? currentSectionData.Left : currentSectionData.Right;
@@ -277,30 +276,25 @@ namespace Controller
             // Checks if the participant can be moved to a new section based on the targetSectionData of the next section
             if (CanBeMoved(targetSectionData))
             {
-                // Checks if the participant is passing the finish line, based on the current sectiontype and next sectiontype
-                if (PassingFinish(currentSection.SectionType, targetSection.SectionType))
+                ADriverMoved?.Invoke(this, new DriverMovedEventArgs(participant, currentSection, elapsedTime));
+                if (currentSection.SectionType == SectionTypes.Finish)
                 {
-                    // Adds a lap to the current participant
-                    AddLap(participant);
                     // Checks if the participant is finished
                     if (IsFinished(participant))
                     {
                         // Clears the participant out of the race
-                        FinishParticipant(participant, currentSection);
+                        ClearFinishedSectionDataSpot(currentSection, isLeft);
                         return;
                     }
                 }
                 // The participant has to be moved, the participant is to be cleared of the current sectiondata and
                 // and added to the next sections sectionsdata
                 SetCurrentAndTargetPositions(currentSection, targetSection, participant, currentDistance, isLeft, targetIsLeft);
-
-
             }
             // Participant should have moved, but could not because the next sectiondata was full. So the distance will
             // be set to the maximum value possible: sectionlength - 1
             else
             {
-
                 SetMaxDistance(currentSection, isLeft);
             }
         }
@@ -357,57 +351,37 @@ namespace Controller
 
         public bool PassingFinish(SectionTypes currentSectionType, SectionTypes targetSectionType)
         {
-            if (currentSectionType == SectionTypes.Finish && targetSectionType != SectionTypes.Finish)
+            return currentSectionType == SectionTypes.Finish && targetSectionType != SectionTypes.Finish;
+        }
+
+        public void ClearFinishedSectionDataSpot(Section section, bool isLeft)
+        {
+            if (isLeft)
             {
-                return true;
+                Positions[section].Left = null;
+                Positions[section].DistanceLeft = 0;
             }
-            return false;
-        }
-
-        public void FinishParticipant(IParticipant par, Section section)
-        {
-            ParticipantFinished[par] = true;
-            Positions[section].Left = null;
-            Positions[section].DistanceLeft = 0;
-        }
-
-        public void AddLap(IParticipant par)
-        {
-            ParticipantLaps[par]++;
-        }
-
-        public bool IsFinished(IParticipant participant)
-        {
-            // Checks if the finish flag is currently out
-            if (!IsFinishFlagOut)
-            {
-                // The finish flag is not out, but a participant has reached the max laps.
-                if (ParticipantLaps[participant] == _maxLaps + 1)
-                {
-                    // Put the finishflag out and return true as the participant is finished and return true
-                    IsFinishFlagOut = true;
-                    return true;
-                }
-            }
-            // The finish flag is out, so the inserted sectionData has to be finished
             else
             {
+                Positions[section].Right = null;
+                Positions[section].DistanceRight = 0;
+            }
+        }
+
+        public bool IsFinished(IParticipant par)
+        {
+            if (IsFinishFlagOut || ClassificationsCache[par].Finished)
+            {
+                ParticipantFinished.Add(par);
+                IsFinishFlagOut = true;
                 return true;
             }
             return false;
         }
-        // TODO fix throw in ParticipantFinished[participant]
-        public bool IsParticipantFinished(IParticipant participant)
-        {
-            return ParticipantFinished[participant];
-        }
 
-        public void AreAllParticipantsFinished()
+        public bool AreAllParticipantsFinished()
         {
-            if (ParticipantFinished.Count == Pilots.Count)
-            {
-                AreAllFinished = true;
-            }
+            return ParticipantFinished.Count == Pilots.Count;
         }
 
         #endregion

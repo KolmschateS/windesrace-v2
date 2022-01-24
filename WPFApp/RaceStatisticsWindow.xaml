@@ -23,9 +23,13 @@
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                 <ColumnDefinition Width="1*"></ColumnDefinition>
                 <ColumnDefinition Width="2*"></ColumnDefinition>
+                <ColumnDefinition Width="2*"></ColumnDefinition>
+                <ColumnDefinition Width="2*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <Label Grid.Column="0" FontSize="12">Track:</Label>
             <Label Grid.Column="1" FontSize="12" Content="{Binding CurrentRace.Track.Name}"></Label>
+            <Label Grid.Column="2" FontSize="12" Content="{Binding CurrentRace.IsFinishFlagOut}"/>
+            <Label Grid.Column="3" FontSize="12" Content="{Binding CurrentRace.RaceLength}"/>
         </Grid>
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
@@ -67,12 +71,15 @@
                 <ListView Grid.Row="2" ItemsSource="{Binding Classifications}">
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Header="Pos." DisplayMemberBinding="{Binding Position}"></GridViewColumn>
+                            <GridViewColumn Header="Position" DisplayMemberBinding="{Binding Position }"></GridViewColumn>
+                            <GridViewColumn Header="Lap count" DisplayMemberBinding="{Binding LapCount }"></GridViewColumn>
+                            <GridViewColumn Header="Section count" DisplayMemberBinding="{Binding SectionCountThisLap}"></GridViewColumn>
                             <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Participant.Name}"></GridViewColumn>
-                            <GridViewColumn Header="Last laptime" DisplayMemberBinding="{Binding LastLaptime}" />
-                            <GridViewColumn Header="Diff. to leader" DisplayMemberBinding="{Binding DiffToLeader}"></GridViewColumn>
-                            <GridViewColumn Header="Points" DisplayMemberBinding="{Binding CurrentPoints}" />
-                            <GridViewColumn Header="Projected points" DisplayMemberBinding="{Binding ProjectedPoints}"></GridViewColumn>
+                            <GridViewColumn Header="Team" DisplayMemberBinding="{Binding Participant.TeamColor}"></GridViewColumn>
+                            <GridViewColumn Header="Last laptime" DisplayMemberBinding="{Binding LastLapTime}"></GridViewColumn>
+                            <GridViewColumn Header="Last sectiontimestamp" DisplayMemberBinding="{Binding LatestSectionTimeStamp}"></GridViewColumn>
+                            <GridViewColumn Header="Total racetime" DisplayMemberBinding="{Binding TotalRaceTime}"></GridViewColumn>
+                            <GridViewColumn Header="Point" DisplayMemberBinding="{Binding Participant.Points}"></GridViewColumn>
                         </GridView>
                     </ListView.View>
                 </ListView>

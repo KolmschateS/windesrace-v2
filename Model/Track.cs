@@ -14,6 +14,7 @@ namespace Model
         public int GridSize { get; set; }
         private readonly int SectionSize = 4;
         public (int x, int y) Dimensions { get; set; }
+        public int TrackLength { get; set; }
 
         public Track(string name, SectionTypes[] sections, int startDirection)
         {
@@ -21,6 +22,7 @@ namespace Model
             StartDirection = startDirection;
             GridSize = SetGridSize(sections);
             Sections = SetSections(sections, startDirection);
+            TrackLength = Sections.Count * Section.SectionLength;
         }
         // Funtion to set the Sections property by looping over an Array containing the sections and inserting them
         // into the Linkedlist with sections
