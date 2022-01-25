@@ -42,8 +42,6 @@ namespace WPFApp
             Visualisation.Initialize(e.Race);
 
             e.Race.DriversChanged += OnDriversChanged;
-
-
         }
 
         private void OnDriversChanged(object o, DriversChangedEventArgs e)
@@ -76,8 +74,8 @@ namespace WPFApp
         {
             _competitionStatisticsWindow = new CompetitionStatisticsWindow();
 
-            //Data.NextRaceEvent += ((CompetitionStatisticsDataContext)_competitionStatisticsWindow.DataContext).OnNextRace;
-            //((CompetitionStatisticsDataContext)_competitionStatisticsWindow.DataContext).OnNextRace(null, new NextRaceArgs(Data.CurrentRace));
+            Data.NextRaceEvent += ((CompetitionStatisticsDataContext)_competitionStatisticsWindow.DataContext).OnNextRace;
+            ((CompetitionStatisticsDataContext)_competitionStatisticsWindow.DataContext).OnNextRace(null, new NextRaceArgs(Data.CurrentRace));
 
             _competitionStatisticsWindow.Show();
         }

@@ -190,7 +190,6 @@ namespace Controller
 
             // List all the classifications, so they can be read
             Classifications = ToListClassificationsCache();
-
         }
 
         private List<Classification> ToListClassificationsCache()
@@ -209,7 +208,6 @@ namespace Controller
                 int Add = AssignPoints(Position);
                 participant.Points += Add;
             }
-
         }
         public static int AssignPoints(int position)
         {

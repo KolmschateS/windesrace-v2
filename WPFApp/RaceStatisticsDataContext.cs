@@ -14,24 +14,18 @@ namespace WPFApp
         public event PropertyChangedEventHandler PropertyChanged;
 
         public Race CurrentRace { get; set; }
-        public List<IParticipant> Participants { get; set; }
         public List<Classification> Classifications { get; set; }
         public string currentTime { get; set; }
-        public BitmapSource FinishImage { get; set; }
-        public readonly string FinishImagePath = @"C:\Users\skolm\source\repos\windesrace-v2\WPFApp\Graphics\FinishFlag.png";
-        public readonly string EmptyImage = @"C:\Users\skolm\source\repos\windesrace-v2\WPFApp\Graphics\EmptyImage.png";
 
         public void OnNextRace(object sender, NextRaceArgs e)
         {
             CurrentRace = e.Race;
-            Participants = new List<IParticipant>();
-            Classifications = new List<Classification>();
+            Classifications = CurrentRace.Classifications;
             e.Race.DriversChanged += OnDriversChanged;
         }
 
         public void OnDriversChanged(object sender, DriversChangedEventArgs e)
         {
-            Participants = CurrentRace.Pilots;
             Classifications = CurrentRace.Classifications;
             currentTime = CalculateCurrentRaceTime(DateTime.Now, CurrentRace.StartTime);
 

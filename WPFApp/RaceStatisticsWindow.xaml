@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WPFApp"
         mc:Ignorable="d"
-        Title="RaceStatistics" Height="450" Width="800">
+        Title="RaceStatistics" Height="500" Width="600">
     <Window.DataContext>
         <local:RaceStatisticsDataContext/>
     </Window.DataContext>
@@ -15,7 +15,6 @@
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="1*"></RowDefinition>
             <RowDefinition Height="1*"></RowDefinition>
-            <RowDefinition Height="8*"></RowDefinition>
             <RowDefinition Height="8*"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid Grid.Row="1">
@@ -29,7 +28,6 @@
             <Label Grid.Column="0" FontSize="12">Track:</Label>
             <Label Grid.Column="1" FontSize="12" Content="{Binding CurrentRace.Track.Name}"></Label>
             <Label Grid.Column="2" FontSize="12" Content="{Binding CurrentRace.IsFinishFlagOut}"/>
-            <Label Grid.Column="3" FontSize="12" Content="{Binding CurrentRace.RaceLength}"/>
         </Grid>
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
@@ -47,26 +45,6 @@
                     <RowDefinition Height="1*"></RowDefinition>
                     <RowDefinition Height="5*"></RowDefinition>
                 </Grid.RowDefinitions>
-                <Label Grid.Row="1" FontSize ="16" FontWeight="ExtraBold" Content="Participants"/>
-                <ListView Grid.Row="2" ItemsSource="{Binding Participants}">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"></GridViewColumn>
-                            <GridViewColumn Header="Team" DisplayMemberBinding="{Binding TeamColor}"></GridViewColumn>
-                            <GridViewColumn Header="Speed" DisplayMemberBinding="{Binding Equipment.FakeSpeed}" />
-                            <GridViewColumn Header="Strength" DisplayMemberBinding="{Binding Equipment.Strength}"></GridViewColumn>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
-            </Grid>
-        </Grid>
-        <Grid Grid.Row="4">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"></RowDefinition>
-                    <RowDefinition Height="1*"></RowDefinition>
-                    <RowDefinition Height="5*"></RowDefinition>
-                </Grid.RowDefinitions>
                 <Label Grid.Row="1" FontSize ="16" FontWeight="ExtraBold" Content="Classification"/>
                 <ListView Grid.Row="2" ItemsSource="{Binding Classifications}">
                     <ListView.View>
@@ -75,11 +53,12 @@
                             <GridViewColumn Header="Lap count" DisplayMemberBinding="{Binding LapCount }"></GridViewColumn>
                             <GridViewColumn Header="Section count" DisplayMemberBinding="{Binding SectionCountThisLap}"></GridViewColumn>
                             <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Participant.Name}"></GridViewColumn>
+                            <GridViewColumn Header="Speed" DisplayMemberBinding="{Binding Participant.Equipment.Speed}" />
                             <GridViewColumn Header="Team" DisplayMemberBinding="{Binding Participant.TeamColor}"></GridViewColumn>
+                            <GridViewColumn Header="Strength" DisplayMemberBinding="{Binding Participant.Equipment.Strength}"></GridViewColumn>
                             <GridViewColumn Header="Last laptime" DisplayMemberBinding="{Binding LastLapTime}"></GridViewColumn>
-                            <GridViewColumn Header="Last sectiontimestamp" DisplayMemberBinding="{Binding LatestSectionTimeStamp}"></GridViewColumn>
                             <GridViewColumn Header="Total racetime" DisplayMemberBinding="{Binding TotalRaceTime}"></GridViewColumn>
-                            <GridViewColumn Header="Point" DisplayMemberBinding="{Binding Participant.Points}"></GridViewColumn>
+                            <GridViewColumn Header="Points" DisplayMemberBinding="{Binding Participant.Points}"></GridViewColumn>
                         </GridView>
                     </ListView.View>
                 </ListView>

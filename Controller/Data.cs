@@ -18,6 +18,7 @@ namespace Controller
             _random = new Random(DateTime.Now.Millisecond);
             Competition = new Competition();
             AddParticipantsToCompetition(6);
+            Competition.Teams = GetTeams(Competition.Participants);
             AddTracksToCompetition();
         }
 
@@ -31,7 +32,18 @@ namespace Controller
                 Competition.Participants.Add(astronaut);
             }
         }
-
+        public static List<TeamColors> GetTeams(List<IParticipant> participants)
+        {
+            List<TeamColors> result = new List<TeamColors>();
+            foreach(IParticipant participant in participants)
+            {
+                if (!result.Contains(participant.TeamColor))
+                {
+                    result.Add(participant.TeamColor);
+                }
+            }
+            return result;
+        }
         // This method adds track to the competition
         public static void AddTracksToCompetition()
         {
