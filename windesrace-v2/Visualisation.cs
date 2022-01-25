@@ -43,30 +43,69 @@ namespace windesrace_v2
             string[] drawString = Graphics[(direction, section.SectionType)];
             foreach (string line in drawString)
             {
-                Console.Write(SetSectionstring(line, leftParticipant, rightParticipant));
+                if (HasLR(line))
+                {
+                    if (line.Contains("L"))
+                    {
+                        if (leftParticipant != null)
+                        {
+                            Console.Write(SetSectionstring(line, leftParticipant.Equipment.IsBroken, leftParticipant.Initial));
+                        }
+                        else
+                        {
+                            Console.Write(SetSectionstring(line, false, " "));
+                        }
+                    }
+                    if (line.Contains("R"))
+                    {
+                        if (rightParticipant != null)
+                        {
+                            Console.Write(SetSectionstring(line, rightParticipant.Equipment.IsBroken, rightParticipant.Initial));
+                        }
+                        else
+                        {
+                            Console.Write(SetSectionstring(line, false, " "));
+                        }
+                    }
+                }
+                else
+                {
+                    Console.Write(line);
+                }
                 Console.CursorTop += 1;
                 Console.CursorLeft -= 4;
             }
             Console.CursorTop -= 4;
         }
 
-        public static string SetSectionstring(string sectionString, IParticipant left, IParticipant right)
+        public static bool HasLR(string input)
         {
-            if (left != null && left.Equipment.IsBroken && sectionString.Contains("L"))
-            {
-                return sectionString.Replace("L", "%");
-            }
-            if (right != null && right.Equipment.IsBroken && sectionString.Contains("R"))
-            {
-                return sectionString.Replace("R", "%");
-            }
-            // If the particpants != null and the string contains L, replace the L with the leftParticipant Initial
-            if (left != null && sectionString.Contains("L")) return sectionString.Replace("L", left.Initial);
-            
-            // If the particpants != null and the string contains L, replace the L with the rightParticipant Initial
-            if (right != null && sectionString.Contains("R")) return sectionString.Replace("R", right.Initial);
+            return input.Contains("L") || input.Contains("R");
+        }
 
-            return sectionString.Contains("L") ? sectionString.Replace("L", " ") : sectionString.Replace("R", " ");
+        public static string SetSectionstring(string sectionString, bool IsBroken, string initial)
+        {
+            if (sectionString.Contains("L")){
+                if (IsBroken)
+                {
+                    return sectionString.Replace("L", "%");
+                }
+                else
+                {
+                    return sectionString.Replace("L", initial);
+                }
+            }
+            if (sectionString.Contains("R")){
+                if (IsBroken)
+                {
+                    return sectionString.Replace("R", "%");
+                }
+                else
+                {
+                    return sectionString.Replace("R", initial);
+                }
+            }
+            return sectionString;
         }
 
         // SetGraphics is the function that sets the two-key dictionary
