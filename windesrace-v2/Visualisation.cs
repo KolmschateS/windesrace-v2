@@ -7,27 +7,56 @@ namespace windesrace_v2
 {
     public static class Visualisation
     {
-        // The Two-key dictionary works as following:
-        // Dictionary<(int direction, Sectiontypes sectiontype), String[] SectionString>
+        /// <summary>
+        /// Dictionary that contains all the graphic "puzzle" pieces used to build the track visualisation.
+        /// Insert a direction and a sectiontype to retrieve a string[], which contains four rows containing character to be drawn for the
+        /// corresponding section and direction.
+        /// </summary>
         public static Dictionary<(int, SectionTypes), string[]> Graphics { get; set; }
+
+        /// <summary>
+        /// The current race being run, that needs to be drawn.
+        /// </summary>
         private static Race _currentRace;
+
+        /// <summary>
+        /// Initialize class to set the currentRace with the given race
+        /// </summary>
+        /// <param name="race"></param>
         public static void Initialize(Race race)
         {
             _currentRace = race;
             SetGraphics();
-            Console.Clear();
         }
 
+        /// <summary>
+        /// Eventhandler which handles when a next race is set. It initializes the next race based on the NextRaceArgs.Race.
+        /// It clears the console.
+        /// It links the DriversChanged event of the currentrace to the Visualisation EventHandler OnDriversChanged
+        /// </summary>
+        /// <param name="o"></param>
+        /// <param name="e"></param>
         public static void OnNextRace(object o, NextRaceArgs e)
         {
             Initialize(e.Race);
+            Console.Clear();
             _currentRace.DriversChanged += OnDriversChanged;
         }
+
+        /// <summary>
+        /// Eventhandler which is called when the drivers have changed. It calls the DrawTrack function so the current track and participants are drawn in the console.
+        /// </summary>
+        /// <param name="o"></param>
+        /// <param name="eventArgs"></param>
         public static void OnDriversChanged(object o, DriversChangedEventArgs eventArgs)
         {
             DrawTrack(eventArgs.Track);
         }
 
+        /// <summary>
+        /// Function which draws each section on the console given with the Track parameter
+        /// </summary>
+        /// <param name="track"></param>
         public static void DrawTrack(Track track)
         {
             foreach (Section section in track.Sections)
@@ -37,13 +66,21 @@ namespace windesrace_v2
                 DrawSection(section, section.Direction, sectionData.Left, sectionData.Right);
             }
         }
-        // TODO issue with a -4 being drawn
+
+        /// <summary>
+        /// Function that draws a section on the console
+        /// </summary>
+        /// <param name="section"></param>
+        /// <param name="direction"></param>
+        /// <param name="leftParticipant"></param>
+        /// <param name="rightParticipant"></param>
         public static void DrawSection(Section section, int direction, IParticipant leftParticipant, IParticipant rightParticipant)
         {
             string[] drawString = Graphics[(direction, section.SectionType)];
             foreach (string line in drawString)
             {
                 if (HasLR(line))
+                // If it contains an L or R we need to check if we need to fill it with a participant
                 {
                     if (line.Contains("L"))
                     {
@@ -69,6 +106,7 @@ namespace windesrace_v2
                     }
                 }
                 else
+                // Doesn't contain a L or R, draw the line as given.
                 {
                     Console.Write(line);
                 }
@@ -78,11 +116,23 @@ namespace windesrace_v2
             Console.CursorTop -= 4;
         }
 
+        /// <summary>
+        /// Checks if a given string contains a L or R
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public static bool HasLR(string input)
         {
             return input.Contains("L") || input.Contains("R");
         }
 
+        /// <summary>
+        /// Replaces an L or R in the given string. With a % is IsBroken == true. With an initial if IsBroken == false. The orginal string if an L or R is not found.
+        /// </summary>
+        /// <param name="sectionString"></param>
+        /// <param name="IsBroken"></param>
+        /// <param name="initial"></param>
+        /// <returns></returns>
         public static string SetSectionstring(string sectionString, bool IsBroken, string initial)
         {
             if (sectionString.Contains("L")){

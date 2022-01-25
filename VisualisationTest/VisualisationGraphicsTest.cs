@@ -3,7 +3,8 @@ using NUnit.Framework;
 using windesrace_v2;
 using Model;
 
-namespace VisualisationTest
+namespace 
+    ConsoleVisualisationTest
 {
     // Test to test if the Graphics are loaded in correctly
     // In visualisation in Initialize the SetGraphics function is called
@@ -13,7 +14,7 @@ namespace VisualisationTest
     [TestFixture]
     public class VisualisationGraphicsTest
     {
-        
+
         [SetUp]
         public void Setup()
         {
@@ -24,7 +25,7 @@ namespace VisualisationTest
 
         // For all tests
         // D# Number is for the direction
-        // after that comes the 
+        // after that comes the SectionType
 
         #region GraphicsTest
 
@@ -32,8 +33,8 @@ namespace VisualisationTest
         public void D0FinishVertical()
         {
             string[] actual = Visualisation.Graphics[(0, SectionTypes.Finish)];
-            string[] expected = { "║  ║", "║▒▒║", "║L ║", "║ R║"};
-
+            string[] expected = { "║  ║", "║▒▒║", "║L ║", "║ R║" };
+            
             Assert.AreEqual(expected, actual);
         }
 

@@ -9,7 +9,7 @@ namespace Controller
     public class Race
     {
         private readonly Timer _timer;
-        private const int TimerInterval = 200;
+        private const int TimerInterval = 75;
 
         public event EventHandler<DriversChangedEventArgs> DriversChanged;
         public event EventHandler<DriverMovedEventArgs> ADriverMoved;
@@ -28,7 +28,6 @@ namespace Controller
         public bool IsFinishFlagOut { get; set; }
         public int RaceLength { get; set; }
 
-        // Constructor
         public Race(Track track, List<IParticipant> pilots)
         {
             Random = new Random(DateTime.Now.Millisecond);
