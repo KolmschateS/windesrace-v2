@@ -55,6 +55,9 @@ namespace WPFApp
             foreach(Section section in track.Sections)
             {
                 DrawSection(g, section);
+            }
+            foreach (Section section in track.Sections)
+            {
                 DrawParticipants(g, section);
             }
 
@@ -179,9 +182,6 @@ namespace WPFApp
         #region DrawParticipants
         public static void DrawParticipants(Graphics g, Section section)
         {
-            int x = CalculateCoordinateBasedOnConsoleCoordinates(section.X);
-            int y = CalculateCoordinateBasedOnConsoleCoordinates(section.Y);
-
             SectionData sd = _race.GetSectionData(section);
             DrawParticipant(g, sd.Left, sd.DistanceLeft, section, true);
             DrawParticipant(g, sd.Right, sd.DistanceRight, section, false);
@@ -232,7 +232,7 @@ namespace WPFApp
                     throw(new Exception($"Direction out of bounds in DetermineParticipantCoordinates: Direction: {section.Direction}"));
             }
             result.x -= ParticipantWidth / 2;
-            //result.y -= ParticipantHeight / 2;
+            result.y -= ParticipantHeight / 2;
             return result;
         }
 
@@ -267,8 +267,7 @@ namespace WPFApp
             //rotate
             if (IsSectionACorner(section.SectionType))
             {
-                // TODO fix this
-                g.RotateTransform(-CalculateAngle(section.SectionType, distance) - 90);
+                g.RotateTransform(CalculateRotationAngle(section.Direction, section.SectionType ,distance));
             }
             else
             {
@@ -280,6 +279,12 @@ namespace WPFApp
             g.DrawImage(p, new Point(0, 0));
 
             return returnBitmap;
+        }
+        private static int CalculateRotationAngle(int direction, SectionTypes sectionType, int distance)
+        {
+            int circleAngle = distance / (Section.SectionLength / 90);
+            int initialAngle = direction * 90;
+            return sectionType == SectionTypes.LeftCorner ? initialAngle - circleAngle : initialAngle + circleAngle;
         }
 
         private static int DistanceInPixels(int distance)
@@ -327,11 +332,6 @@ namespace WPFApp
         {
             int middle = SectionDimensions / 2;
             return isLeft ? middle + SectionPaddingInside : middle - SectionPaddingInside;
-        }
-
-        private static int DetermineParticipantRotationInCorner(SectionTypes st, int angle)
-        {
-            return 0;
         }
         private static (int x, int y) ReverseCoordsBasedOnDirectionAndSection((int x, int y) sectionCoords,(int x, int y) circleCoords, SectionTypes st, int dir)
         {
