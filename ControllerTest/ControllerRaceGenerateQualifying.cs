@@ -8,13 +8,18 @@ using NUnit.Framework;
 
 namespace ControllerTest
 {
+    /// <summary>
+    /// Tests to test the Race.GenerateQualifyingFunctionUsed in the Race Constructor.
+    /// An amount of participants is injected into the race. Based on the amount of startgrids in the current track the function has to return the correct amount
+    /// of participants
+    /// </summary>
     [TestFixture]
     public class ControllerRaceGenerateQualifying
     {
         [SetUp]
         public void Setup()
         {
-            
+            Data.Initialize();
         }
 
         [Test]

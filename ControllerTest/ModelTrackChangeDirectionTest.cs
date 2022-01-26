@@ -16,66 +16,21 @@ namespace ControllerTest
         }
 
         [Test]
-        public void DirectionIsSameAfterStraight()
+        [TestCase(SectionTypes.Straight, 0, 0)]
+        [TestCase(SectionTypes.Finish, 0, 0)]
+        [TestCase(SectionTypes.StartGrid, 0, 0)]
+        [TestCase(SectionTypes.Straight, 2, 2)]
+        [TestCase(SectionTypes.Finish, 2, 2)]
+        [TestCase(SectionTypes.StartGrid, 2, 2)]
+        [TestCase(SectionTypes.RightCorner, 0, 1)]
+        [TestCase(SectionTypes.LeftCorner, 0, 3)]
+        [TestCase(SectionTypes.RightCorner, 2, 3)]
+        [TestCase(SectionTypes.LeftCorner, 2, 1)]
+        [TestCase(SectionTypes.RightCorner, 3, 0)]
+        [TestCase(SectionTypes.LeftCorner, 3, 2)]
+        public void ChangeDirectionTests(SectionTypes sectiontype, int inputDirection, int expectedDirection)
         {
-            int direction = 0;
-            Assert.AreEqual(direction, _track.ChangeDirection(SectionTypes.Straight, direction));
-        }
-        
-        [Test]
-        public void DirectionIsSameAfterFinish()
-        {
-            int direction = 0;
-            Assert.AreEqual(direction, _track.ChangeDirection(SectionTypes.Finish, direction));
-        }
-        
-        [Test]
-        public void DirectionIsSameAfterStartGrid()
-        {
-            int direction = 0;
-            Assert.AreEqual(direction, _track.ChangeDirection(SectionTypes.StartGrid, direction));
-        }
-        
-        [Test]
-        public void D1AfterD0RightCorner()
-        {
-            int direction = 0;
-            Assert.AreEqual(1, _track.ChangeDirection(SectionTypes.RightCorner, direction));
-        }
-        
-        [Test]
-        public void D1AfterD2LeftCorner()
-        {
-            int direction = 2;
-            Assert.AreEqual(1, _track.ChangeDirection(SectionTypes.LeftCorner, direction));
-        }
-        
-        [Test]
-        public void D3AfterD0LeftCorner()
-        {
-            int direction = 0;
-            Assert.AreEqual(3, _track.ChangeDirection(SectionTypes.LeftCorner, direction));
-        }
-        
-        [Test]
-        public void D0AfterD3RightCorner()
-        {
-            int direction = 3;
-            Assert.AreEqual(0, _track.ChangeDirection(SectionTypes.RightCorner, direction));
-        }
-        
-        [Test]
-        public void D2AfterD3LeftCorner()
-        {
-            int direction = 3;
-            Assert.AreEqual(2, _track.ChangeDirection(SectionTypes.LeftCorner, direction));
-        }
-        
-        [Test]
-        public void D0AfterD1LeftCorner()
-        {
-            int direction = 1;
-            Assert.AreEqual(0, _track.ChangeDirection(SectionTypes.LeftCorner, direction));
+            Assert.AreEqual(expectedDirection, _track.ChangeDirection(sectiontype, inputDirection));
         }
     }
 }
