@@ -15,12 +15,11 @@ namespace WPFApp
 
         #region Sizes
 
-        internal const int SectionDimensions = 168;
-        private const int ParticipantWidth = 40;
-        private const int ParticipantHeight = 32;
+        internal const int SectionDimensions = 128;
+        private const int ParticipantWidth = 35;
+        private const int ParticipantHeight = 28;
 
         private const int SectionPaddingInside = 25;
-        private const int SectionPaddingOutside = 40;
 
         #endregion
 
@@ -48,7 +47,7 @@ namespace WPFApp
         #endregion
         public static BitmapSource DrawTrack(Track track)
         {
-            (int x, int y) size = GetTrackDimensions(track);
+            (int x, int y) size = GetTrackDimensions(track.Sections);
             Bitmap canvas = ImageCache.GetCanvas(size.x, size.y);
             Graphics g = Graphics.FromImage(canvas);
 
@@ -70,25 +69,26 @@ namespace WPFApp
         {
             Bitmap bmp = ImageCache.GetBitmap(DetermineSection(section));
             Bitmap rotated = RotateSection((Bitmap)bmp.Clone(), section);
+            Bitmap resize = new Bitmap(rotated, new Size(SectionDimensions, SectionDimensions));
             int x = section.X * SectionDimensions / 4;
             int y = section.Y * SectionDimensions / 4;
-            g.DrawImage(rotated, x, y);
+            g.DrawImage(resize, x, y);
         }
 
-
-        private static (int width, int heigth) GetTrackDimensions(Track track)
+        // TODO write test
+        private static (int width, int heigth) GetTrackDimensions(LinkedList<Section> sections)
         {
-            (int minX, int minY, int maxX, int maxY) d = (0, 0, 0, 0);
+            (int minX, int minY, int maxX, int maxY) dimensions = (0, 0, 0, 0);
 
-            foreach (Section section in track.Sections)
+            foreach (Section section in sections)
             {
-                if (section.X < d.minX) d.minX = section.X;
-                if (section.X > d.maxX) d.maxX = section.X;
-                if (section.Y < d.minY) d.minY = section.Y;
-                if (section.Y > d.maxY) d.maxY = section.Y;
+                dimensions.minX = section.X < dimensions.minX ? section.X : dimensions.minX;
+                dimensions.maxX = section.X > dimensions.maxX ? section.X : dimensions.maxX;
+                dimensions.minY = section.Y < dimensions.minY ? section.Y : dimensions.minY;
+                dimensions.maxY = section.Y > dimensions.maxY ? section.Y : dimensions.maxY;
             }
-            int width = (d.maxX - Math.Abs(d.minX)) * SectionDimensions / 4 + SectionDimensions;
-            int height = (d.maxY - Math.Abs(d.minY)) * SectionDimensions / 4 + SectionDimensions;
+            int width = (dimensions.maxX + Math.Abs(dimensions.minX)) * SectionDimensions / 4 + SectionDimensions;
+            int height = (dimensions.maxY + Math.Abs(dimensions.minY)) * SectionDimensions / 4 + SectionDimensions;
 
             return (width, height);
         }
@@ -197,36 +197,36 @@ namespace WPFApp
                 Bitmap rotatedP = RotateParticipant(resize, section, distance);
                 if (IsSectionACorner(section.SectionType))
                 {
-                    coord = DetermineParticipantCoordinatesCircle(p, isLeft, section, distance);
+                    coord = DetermineParticipantCoordinatesCircle(isLeft, section, distance);
                 }
                 else
                 {
-                    coord = DetermineParticipantCoordinatesStraight(p, isLeft, section, distance);
+                    coord = DetermineParticipantCoordinatesStraight(isLeft, section, distance);
                 }
                 g.DrawImage(rotatedP, coord.x, coord.y);
                 if (p.Equipment.IsBroken) { g.DrawImage(ImageCache.GetBitmap(Broken), coord.x, coord.y); }
             }
         }
-        private static (int x, int y) DetermineParticipantCoordinatesStraight(IParticipant p, bool isLeft, Section section, int distance)
+        private static (int x, int y) DetermineParticipantCoordinatesStraight(bool isLeft, Section section, int distance)
         {
             (int x, int y) result = (CalculateCoordinateBasedOnConsoleCoordinates(section.X), CalculateCoordinateBasedOnConsoleCoordinates(section.Y));
             switch (section.Direction)
             {
                 case 0:
-                    result.x += GetLRPositionOnSection(isLeft);
+                    result.x += GetLRPositionOnSection(isLeft, section.Direction);
                     result.y += DistanceInPixels(Section.SectionLength) - DistanceInPixels(distance);
                     break;
                 case 1:
                     result.x += DistanceInPixels(distance);
-                    result.y += GetLRPositionOnSection(isLeft);
+                    result.y += GetLRPositionOnSection(isLeft, section.Direction);
                     break;
                 case 2:
-                    result.x += GetLRPositionOnSection(isLeft);
+                    result.x += GetLRPositionOnSection(isLeft, section.Direction);
                     result.y += DistanceInPixels(distance);
                     break;
                 case 3:
                     result.x += DistanceInPixels(Section.SectionLength) - DistanceInPixels(distance);
-                    result.y += GetLRPositionOnSection(isLeft);
+                    result.y += GetLRPositionOnSection(isLeft, section.Direction);
                     break;
                 default:
                     throw(new Exception($"Direction out of bounds in DetermineParticipantCoordinates: Direction: {section.Direction}"));
@@ -236,22 +236,22 @@ namespace WPFApp
             return result;
         }
 
-        // TODO makes function that calculates where the participants needs to be drawn while in a corner.
-        private static (int x, int y) DetermineParticipantCoordinatesCircle(IParticipant p, bool isLeft, Section section, int distance)
+        private static (int x, int y) DetermineParticipantCoordinatesCircle(bool isLeft, Section section, int distance)
         {
             (int x, int y) sectionCoords = (CalculateCoordinateBasedOnConsoleCoordinates(section.X), CalculateCoordinateBasedOnConsoleCoordinates(section.Y));
 
 
             int angle = CalculateAngle(section.SectionType, distance);
 
-            int radius = GetRadius(section.SectionType, isLeft);
+            int radius = GetRadius(isLeft);
 
             int x = (int)(radius * Math.Sin(Math.PI * 2 * angle / 360));
             int y = (int)(radius * Math.Cos(Math.PI * 2 * angle / 360));
 
             return ReverseCoordsBasedOnDirectionAndSection(sectionCoords, (x, y), section.SectionType, section.Direction);
         }
-        private static int CalculateAngle(SectionTypes st, int distance)
+        
+        public static int CalculateAngle(SectionTypes st, int distance)
         {
             return st == SectionTypes.LeftCorner ? distance / (Section.SectionLength / 90) : 90 - (distance / (Section.SectionLength / 90));
         }
@@ -280,16 +280,17 @@ namespace WPFApp
 
             return returnBitmap;
         }
-        private static int CalculateRotationAngle(int direction, SectionTypes sectionType, int distance)
+        
+        public static int CalculateRotationAngle(int direction, SectionTypes sectionType, int distance)
         {
             int circleAngle = distance / (Section.SectionLength / 90);
             int initialAngle = direction * 90;
             return sectionType == SectionTypes.LeftCorner ? initialAngle - circleAngle : initialAngle + circleAngle;
         }
-
-        private static int DistanceInPixels(int distance)
+        public static int DistanceInPixels(int distance)
         {
-            return distance / (Section.SectionLength / SectionDimensions);
+            double calc = (double)distance / Section.SectionLength * SectionDimensions;
+            return (int)calc;
         }
 
         private static string GetImageBasedOnTeamColor(TeamColors tc)
@@ -311,28 +312,34 @@ namespace WPFApp
             }
         }
         #endregion
-        private static int CalculateCoordinateBasedOnConsoleCoordinates(int coord)
+        public static int CalculateCoordinateBasedOnConsoleCoordinates(int coord)
         {
             return coord * SectionDimensions / 4;
         }
-        private static bool IsSectionACorner(SectionTypes st)
+        public static bool IsSectionACorner(SectionTypes st)
         {
             return st != SectionTypes.Straight && st != SectionTypes.StartGrid && st != SectionTypes.Finish;
         }
-        private static int GetRadius(SectionTypes st, bool isLeft)
-        {
-            // Checks if the corner goes to right and the position is at the inside
-            bool IsInnerRadius = (st == SectionTypes.LeftCorner && isLeft) || (st == SectionTypes.RightCorner && !isLeft);
 
-            // If the corner is on the inside return the outerPadding otherwise return the position to the middle
-            return GetLRPositionOnSection(IsInnerRadius);
+        // TODO test this
+        public static int GetRadius(bool isLeft)
+        {
+            return isLeft ? SectionDimensions / 2 + SectionPaddingInside : SectionDimensions / 2 - SectionPaddingInside;
+        }
+        // TODO test this
+        private static int GetLRPositionOnSection(bool isLeft, int direction)
+        {
+            if(direction <= 1)
+            {
+                return isLeft ? SectionDimensions / 2 - SectionPaddingInside : SectionDimensions / 2 + SectionPaddingInside;
+            }
+            else
+            {
+                return isLeft ? SectionDimensions / 2 + SectionPaddingInside : SectionDimensions / 2 - SectionPaddingInside;
+            }
         }
 
-        private static int GetLRPositionOnSection(bool isLeft)
-        {
-            int middle = SectionDimensions / 2;
-            return isLeft ? middle + SectionPaddingInside : middle - SectionPaddingInside;
-        }
+        // TODO test this
         private static (int x, int y) ReverseCoordsBasedOnDirectionAndSection((int x, int y) sectionCoords,(int x, int y) circleCoords, SectionTypes st, int dir)
         {
             (int x, int y) resultCircle = (0,0);

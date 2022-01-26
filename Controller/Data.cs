@@ -23,7 +23,7 @@ namespace Controller
             TrackData.Initialize();
             _random = new Random(DateTime.Now.Millisecond);
             Competition = new Competition();
-            Competition.Participants = GetRandomParticipants(6);
+            Competition.Participants = GetRandomParticipants(16);
             Competition.Teams = GetTeams(Competition.Participants);
             Competition.Tracks = EnqueueTracks(TrackData.Tracks);
         }

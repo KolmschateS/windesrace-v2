@@ -17,7 +17,6 @@ namespace Controller
         public List<IParticipant> Pilots { get; set; }
         public List<Classification> Classifications { get; set; }
         public Dictionary<IParticipant, Classification> ClassificationsCache { get; set; }
-        public Dictionary<IParticipant, Classification> DefinitiveClassifications { get; set; }
         public DateTime StartTime { get; set; }
         private Random Random { get; set; }
         public List<IParticipant> ParticipantFinished { get; set; }
@@ -37,7 +36,6 @@ namespace Controller
             Track = track;
             ParticipantFinished = new List<IParticipant>();
             Classifications = new List<Classification>();
-            DefinitiveClassifications = new Dictionary<IParticipant, Classification>();
             RaceLength = Track.TrackLength * _maxLaps;
 
             Pilots = GenerateQualificationList(pilots);
@@ -158,7 +156,7 @@ namespace Controller
             if (AreAllParticipantsFinished())
             {
                 _timer.Stop();
-                AssignPointsForParticipants(Classifications);
+                AssignPointsForParticipants();
                 Data.SetNextRace();
             }
 
@@ -198,7 +196,7 @@ namespace Controller
             // then order by who finished the last section first, to determine who is in front the last section.
             return ClassificationsCache.Values.OrderByDescending(x => x.LapCount).ThenByDescending(x => x.SectionCountThisLap).ThenBy(x => x.LatestSectionTimeStamp).ToList();
         }
-        public void AssignPointsForParticipants(List<Classification> classifications)
+        public void AssignPointsForParticipants()
         {
             List<Classification> finalClassification = ClassificationsCache.Values.OrderByDescending(x => x.LapCount).ThenBy(x => x.TotalRaceTime).ToList();
             foreach (IParticipant participant in Pilots)
@@ -345,12 +343,6 @@ namespace Controller
 
 
         #region FinishStuff
-
-        public bool PassingFinish(SectionTypes currentSectionType, SectionTypes targetSectionType)
-        {
-            return currentSectionType == SectionTypes.Finish && targetSectionType != SectionTypes.Finish;
-        }
-
         public void ClearFinishedSectionDataSpot(Section section, bool isLeft)
         {
             if (isLeft)
