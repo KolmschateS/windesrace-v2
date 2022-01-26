@@ -17,31 +17,11 @@ namespace ControllerTest
             
         }
 
-        public List<IParticipant> GenerateParticipants(int amount)
-        {
-            List <IParticipant> participants = new List<IParticipant>();
-            for (int i = 0; i < amount; i++)
-            {
-                Astronaut astronaut = new Astronaut(
-                    "test", 
-                    50, 
-                    new Spacecraft(
-                        50,
-                        50,
-                        50,
-                        isBroken: false), 
-                    TeamColors.Blue);
-            
-                participants.Add(astronaut);
-            }
-            return participants;
-        }
-
         [Test]
         public void Startgrid1Is2Count()
         {
             Track track = new Track("test", new SectionTypes[] {SectionTypes.StartGrid, SectionTypes.Finish}, 0);
-            Race race = new Race(track, GenerateParticipants(12));
+            Race race = new Race(track, Data.GetRandomParticipants(12));
             Assert.AreEqual(race.Pilots.Count, 2);
         }
         
@@ -55,7 +35,7 @@ namespace ControllerTest
                 SectionTypes.Finish
             }, 
                 0);
-            Race race = new Race(track, GenerateParticipants(12));
+            Race race = new Race(track, Data.GetRandomParticipants(12));
             Assert.AreEqual(race.Pilots.Count, 6);
         }
         
@@ -72,7 +52,7 @@ namespace ControllerTest
                 SectionTypes.StartGrid,
                 SectionTypes.Finish
             }, 0);
-            Race race = new Race(track, GenerateParticipants(12));
+            Race race = new Race(track, Data.GetRandomParticipants(12));
             Assert.AreEqual(race.Pilots.Count, 12);
         }
         
@@ -92,7 +72,7 @@ namespace ControllerTest
                 SectionTypes.StartGrid,
                 SectionTypes.Finish
             }, 0);
-            Race race = new Race(track, GenerateParticipants(12));
+            Race race = new Race(track, Data.GetRandomParticipants(12));
             Assert.AreEqual(race.Pilots.Count, 12);
         }
         
@@ -106,7 +86,7 @@ namespace ControllerTest
                 SectionTypes.StartGrid,
                 SectionTypes.Finish
             }, 0);
-            Race race = new Race(track, GenerateParticipants(4));
+            Race race = new Race(track, Data.GetRandomParticipants(4));
             Assert.AreEqual(race.Pilots.Count, 4);
         }
         
@@ -126,7 +106,7 @@ namespace ControllerTest
                 SectionTypes.StartGrid,
                 SectionTypes.Finish
             }, 0);
-            Race race = new Race(track, GenerateParticipants(0));
+            Race race = new Race(track, Data.GetRandomParticipants(0));
             Assert.AreEqual(race.Pilots.Count, 0);
         }
         
@@ -137,7 +117,7 @@ namespace ControllerTest
             {
                 SectionTypes.Finish
             }, 0);
-            Race race = new Race(track, GenerateParticipants(12));
+            Race race = new Race(track, Data.GetRandomParticipants(12));
             Assert.AreEqual(race.Pilots.Count, 0);
         }
         

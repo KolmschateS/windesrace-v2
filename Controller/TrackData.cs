@@ -5,11 +5,11 @@ using Model;
 namespace Controller
 { 
     // Class that includes data for all the Tracks
-    public class TrackData
+    public static class TrackData
     {
-        public List<Track> Tracks { get; set; }
+        public static List<Track> Tracks { get; set; }
 
-        public TrackData()
+        public static void Initialize()
         {
             Tracks = new List<Track>();
 

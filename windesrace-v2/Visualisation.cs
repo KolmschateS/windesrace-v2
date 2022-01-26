@@ -158,7 +158,9 @@ namespace windesrace_v2
             return sectionString;
         }
 
-        // SetGraphics is the function that sets the two-key dictionary
+        /// <summary>
+        ///  SetGraphics is the function that sets the two-key dictionary to extract the toDraw strings[]
+        /// </summary>
         private static void SetGraphics()
         {
             Graphics = new Dictionary<(int, SectionTypes), string[]>();

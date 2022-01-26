@@ -1,3 +1,4 @@
+using Controller;
 using Model;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
@@ -17,7 +18,7 @@ namespace ControllerTest
         [Test]
         public void GettingParticipantsPossible()
         {
-            Spacecraft spacecraft = new Spacecraft(50, 50, 50, isBroken: false);
+            Spacecraft spacecraft = new Spacecraft(50, 50, 50, Data.StrengthInit ,isBroken: false);
             Astronaut astronaut = new Astronaut("TestAstronaut", 0, spacecraft, TeamColors.Red);
             _competition.Participants.Add(astronaut);
             IParticipant result = _competition.Participants[0];
