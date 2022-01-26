@@ -17,8 +17,12 @@ namespace Model
             Equipment = equipment;
             TeamColor = teamColor;
         }
-
-        private string SetInitial(String name)
+        /// <summary>
+        /// Gets the first letter (initial) from the give name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns>First letter of given string</returns>
+        public string SetInitial(String name)
         {
             return name[0].ToString();
         }
