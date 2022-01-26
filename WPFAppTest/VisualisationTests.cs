@@ -106,9 +106,77 @@ namespace WPFAppTest
         }
 
         [Test]
-        public void GetRadiusTest(int inputCorner, bool isLeft, int direction, int expected)
+        [TestCase(true, 89)]
+        [TestCase(false, 39)]
+        public void GetRadiusTest(bool isLeft, int expected)
         {
             Assert.AreEqual(expected, Visualisation.GetRadius(isLeft));
+        }
+
+        [Test]
+        [TestCase(true, 0, 39)]
+        [TestCase(false, 0, 89)]
+        [TestCase(true, 1, 39)]
+        [TestCase(false, 1, 89)]
+        [TestCase(true, 2, 89)]
+        [TestCase(false, 2, 39)]
+        [TestCase(true, 3, 89)]
+        [TestCase(false, 3, 39)]
+        public void GetLRPositionOnSectionTest(bool isLeft, int direction, int expected)
+        {
+            Assert.AreEqual(expected, Visualisation.GetLRPositionOnSection(isLeft, direction));
+        }
+
+        [Test]
+        [TestCase(0, 0, 0, 0, 1, 0, -17, 114)]
+        [TestCase(0, 0, 0, 0, 1, 1, -17, -14)]
+        [TestCase(0, 0, 0, 0, 1, 2, 111, -14)]
+        [TestCase(0, 0, 0, 0, 1, 3, 111, 114)]
+
+
+        [TestCase(100, 0, 0, 0, 1, 0, 83, 114)]
+        [TestCase(100, 0, 0, 0, 1, 1, 83, -14)]
+        [TestCase(100, 0, 0, 0, 1, 2, 211, -14)]
+        [TestCase(100, 0, 0, 0, 1, 3, 211, 114)]
+
+        [TestCase(100, 100, 0, 0, 1, 0, 83, 214)]
+        [TestCase(100, 100, 0, 0, 1, 1, 83, 86)]
+        [TestCase(100, 100, 0, 0, 1, 2, 211, 86)]
+        [TestCase(100, 100, 0, 0, 1, 3, 211, 214)]
+
+        [TestCase(0, 0, 0, 0, 2, 0, 111, 114)]
+        [TestCase(0, 0, 0, 0, 2, 1, -17, 114)]
+        [TestCase(0, 0, 0, 0, 2, 2, -17, -14)]
+        [TestCase(0, 0, 0, 0, 2, 3, 111, -14)]
+
+
+        [TestCase(100, 0, 0, 0, 2, 0, 211, 114)]
+        [TestCase(100, 0, 0, 0, 2, 1, 83, 114)]
+        [TestCase(100, 0, 0, 0, 2, 2, 83, -14)]
+        [TestCase(100, 0, 0, 0, 2, 3, 211, -14)]
+
+        [TestCase(100, 100, 0, 0, 2, 0, 211, 214)]
+        [TestCase(100, 100, 0, 0, 2, 1, 83, 214)]
+        [TestCase(100, 100, 0, 0, 2, 2, 83, 86)]
+        [TestCase(100, 100, 0, 0, 2, 3, 211, 86)]
+        public void ReverseCoordsBasedOnDirectionAndSectionTest(
+            int sectionCoordsX, int sectionCoordsY,
+            int circleCoordsX, int circleCoordsY,
+            int sectionType, int direction, int expectedX, int expedtedY)
+        {
+            Assert.AreEqual((expectedX, expedtedY),
+                Visualisation.ReverseCoordsBasedOnDirectionAndSection((sectionCoordsX, sectionCoordsY), (circleCoordsX, circleCoordsY), (SectionTypes)sectionType, direction));
+        }
+
+        [Test]
+        [TestCase(0, 0, 0, 0)]
+        [TestCase(50, 0, 0, 0)]
+        [TestCase(0, 50, 0, 50)]
+        [TestCase(45, 50, 35, 35)]
+        [TestCase(45, 128, 90, 90)]
+        public void DetermineParticipantCoordinatesCircleTest(int angle, int radius, int expectedX, int expectedY)
+        {
+            Assert.AreEqual((expectedX, expectedY), Visualisation.DetermineParticipantCoordinatesCircle(angle, radius));
         }
     }
 }
