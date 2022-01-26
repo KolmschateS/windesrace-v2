@@ -1,7 +1,7 @@
 using Model;
 using NUnit.Framework;
 
-namespace ControllerTest
+namespace ModelTest
 {
     [TestFixture]
     public class ModelTrackSetGridSize

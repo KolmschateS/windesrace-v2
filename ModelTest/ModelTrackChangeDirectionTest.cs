@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using Model;
 
-namespace ControllerTest
+namespace ModelTest
 {
     [TestFixture]
     public class ModelTrackChangeDirectionTest

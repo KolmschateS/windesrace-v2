@@ -3,7 +3,7 @@ using Model;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 
-namespace ControllerTest
+namespace ModelTest
 {
     [TestFixture]
     public class ModelCompetitionParticipants

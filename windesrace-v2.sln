@@ -15,7 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleVisualisationTest", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WPFApp", "WPFApp\WPFApp.csproj", "{5E1F52E8-C094-45C8-99A7-F663F38D328C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFAppTest", "WPFAppTest\WPFAppTest.csproj", "{936A4A6A-A116-4A89-B9C6-B4D037DA0A38}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WPFAppTest", "WPFAppTest\WPFAppTest.csproj", "{936A4A6A-A116-4A89-B9C6-B4D037DA0A38}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModelTest", "ModelTest\ModelTest.csproj", "{B1723E58-A9DA-4C1C-A8BE-4168A5688F40}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{936A4A6A-A116-4A89-B9C6-B4D037DA0A38}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{936A4A6A-A116-4A89-B9C6-B4D037DA0A38}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{936A4A6A-A116-4A89-B9C6-B4D037DA0A38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1723E58-A9DA-4C1C-A8BE-4168A5688F40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1723E58-A9DA-4C1C-A8BE-4168A5688F40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1723E58-A9DA-4C1C-A8BE-4168A5688F40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1723E58-A9DA-4C1C-A8BE-4168A5688F40}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

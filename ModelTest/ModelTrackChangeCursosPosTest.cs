@@ -2,7 +2,7 @@ using System.IO;
 using NUnit.Framework;
 using Model;
 
-namespace ControllerTest
+namespace ModelTest
 {
     [TestFixture]
     public class ModelTrackChangeCursosPosTest
