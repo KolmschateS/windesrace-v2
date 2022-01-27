@@ -12,7 +12,7 @@ namespace Controller
         public static Competition Competition { get; set; }
         public static Race CurrentRace { get; set; }
         public static event EventHandler<NextRaceArgs> NextRaceEvent;
-        public static readonly int _baseQuality = 15, _basePerformance = 15, _baseSpeed = 15, StrengthInit = 5000;
+        public static readonly int _baseQuality = 10, _basePerformance = 10, _baseSpeed = 10, StrengthInit = 5000;
         private static Random _random { get; set; }
 
         /// <summary>
